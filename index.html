@@ -293,6 +293,9 @@
                     <div class="flex items-center space-x-2">
                         <label class="font-bold text-sm text-gray-700">Mês/Ano:</label>
                         <input type="month" id="month-selector" value="2026-10" class="border border-gray-300 rounded px-2 py-1.5 text-sm outline-none focus:border-brand-purple bg-white">
+                        <button id="save-frequencia-btn" class="save-data-btn ml-2 bg-green-600 text-white px-4 py-1.5 rounded font-medium text-sm hover:bg-green-700 transition-colors shadow-sm flex items-center">
+                            <i class="fa-solid fa-floppy-disk mr-2"></i> <span>Salvar</span>
+                        </button>
                     </div>
                 </div>
 
@@ -336,6 +339,9 @@
                     </div>
                     <div class="flex items-center space-x-2 flex-1 justify-end">
                          <span class="text-sm font-semibold text-brand-purple bg-brand-purple/10 px-3 py-1.5 rounded-full hidden sm:inline-flex"><i class="fa-solid fa-calculator mr-1"></i> Faltas calculadas pela Frequência</span>
+                         <button class="save-data-btn ml-2 bg-green-600 text-white px-4 py-1.5 rounded font-medium text-sm hover:bg-green-700 transition-colors shadow-sm flex items-center">
+                             <i class="fa-solid fa-floppy-disk mr-2"></i> <span>Salvar</span>
+                         </button>
                          <button onclick="window.print()" class="ml-2 bg-[#7b4b94] text-white px-4 py-1.5 rounded font-medium text-sm hover:bg-[#613b75] transition-colors shadow-sm flex items-center">
                              <i class="fa-solid fa-print mr-2"></i> Imprimir
                          </button>
@@ -368,86 +374,8 @@
     <!-- Mobile Overlay for Sidebar -->
     <div id="sidebarOverlay" class="fixed inset-0 bg-black/30 z-20 hidden transition-opacity cursor-pointer"></div>
 
-    <!-- Integração com Banco de Dados em Nuvem (Cloud Storage) -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const firebaseConfigStr = typeof __firebase_config !== 'undefined' ? __firebase_config : '{}';
-        
-        async function initCloud() {
-            try {
-                const config = JSON.parse(firebaseConfigStr);
-                if (!config || Object.keys(config).length === 0) return;
-                
-                const app = initializeApp(config);
-                const db = getFirestore(app);
-                const auth = getAuth(app);
-                
-                const token = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-                try {
-                    if (token) {
-                        await signInWithCustomToken(auth, token);
-                    } else {
-                        await signInAnonymously(auth);
-                    }
-                } catch (authErr) {
-                    console.warn("Token falhou, usando modo anônimo", authErr);
-                    await signInAnonymously(auth);
-                }
-                
-                const userId = auth.currentUser?.uid;
-                if (!userId) return;
-
-                const docRef = doc(db, 'artifacts', appId, 'users', userId, 'school_data', 'main_data');
-
-                window.saveDataToCloud = async function() {
-                    try {
-                        // O JSON.parse(JSON.stringify) blinda contra qualquer erro de "undefined" que o Firebase recusa
-                        await setDoc(docRef, {
-                            students: window.students || [],
-                            studentGrades: JSON.parse(JSON.stringify(window.studentGrades || {})),
-                            attendanceState: JSON.parse(JSON.stringify(window.attendanceState || {}))
-                        });
-                        console.log("Dados salvos na nuvem com sucesso!");
-                    } catch(e) {
-                        console.error("Erro ao salvar dados na nuvem:", e);
-                    }
-                };
-
-                onSnapshot(docRef, (snapshot) => {
-                    // Impede que a tela recarregue e atrapalhe caso você esteja clicando rápido
-                    if (snapshot.metadata && snapshot.metadata.hasPendingWrites) return;
-
-                    if (snapshot.exists()) {
-                        const data = snapshot.data();
-                        if (data.students) window.students = data.students;
-                        if (data.studentGrades) window.studentGrades = data.studentGrades;
-                        if (data.attendanceState) window.attendanceState = data.attendanceState;
-                        
-                        if(typeof window.generateTable === 'function' && typeof window.generateBoletimTable === 'function') {
-                            const monthInput = document.getElementById('month-selector');
-                            if (monthInput && document.getElementById('frequencia-view').classList.contains('hidden') === false) {
-                                window.generateTable(monthInput.value);
-                            }
-                            if (document.getElementById('boletim-view').classList.contains('hidden') === false) {
-                                window.generateBoletimTable();
-                            }
-                        }
-                    }
-                }, (error) => {
-                    console.error("Erro no sincronismo:", error);
-                });
-
-            } catch (error) {
-                console.error("Falha ao inicializar nuvem:", error);
-            }
-        }
-        
-        initCloud();
-    </script>
+    <!-- SDK do Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <!-- Sidebar Toggle Script & Lógica Principal -->
     <script>
@@ -482,7 +410,6 @@
         handleResize();
 
         // --- Variáveis Globais de Estado ---
-        // Utilizamos window. para integrar perfeitamente com a nuvem
         window.students = [
             "ANNA LUYZA DA SILVA TOMAZELLI",
             "ARTHUR GENILSON DA SILVA BATISTA",
@@ -495,8 +422,161 @@
         ];
         window.studentGrades = {}; 
         window.attendanceState = {}; 
-        window.saveDataToCloud = window.saveDataToCloud || function() {}; // Fallback caso a nuvem demore
+        window.STORAGE_KEY = 'sistemaPereiraData';
+        
+        // --- CONFIGURAÇÃO DO SUPABASE ---
+        // Assim que você tiver a URL, substitua a 'https://seu-projeto.supabase.co' pela URL real
+        const SUPABASE_URL = 'https://seu-projeto.supabase.co'; 
+        const SUPABASE_ANON_KEY = 'sb_publishable_NiNHqAxuVWC49yTkMJuH8Q_0BHL48C4';
+        
+        let supabaseClient = null;
+        window.cloudReady = false;
 
+        try {
+            // Prevenção de erro: só inicia o Supabase se a URL tiver sido alterada da URL padrão de exemplo
+            if (SUPABASE_URL.startsWith('https://') && SUPABASE_URL !== 'https://seu-projeto.supabase.co') {
+                supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                window.cloudReady = true;
+                console.log("Supabase configurado com sucesso!");
+            } else {
+                console.warn("⚠️ URL do Supabase não foi inserida ou é inválida. O sistema rodará apenas com armazenamento local.");
+            }
+        } catch(e) {
+            console.error("Erro ao iniciar o Supabase:", e);
+        }
+
+        // --- CARREGAMENTO INICIAL DE DADOS ---
+        // Carrega dados locais (fallback)
+        try {
+            const saved = localStorage.getItem(window.STORAGE_KEY);
+            if (saved) {
+                const data = JSON.parse(saved);
+                if (data.students) window.students = data.students;
+                if (data.studentGrades) window.studentGrades = data.studentGrades;
+                if (data.attendanceState) window.attendanceState = data.attendanceState;
+            }
+        } catch (e) {
+            console.warn("Não foi possível carregar os dados locais:", e);
+        }
+
+        // Tenta carregar dados da nuvem (se o Supabase estiver online)
+        async function loadDataFromCloud() {
+            if (!window.cloudReady || !supabaseClient) return;
+            
+            try {
+                const { data, error } = await supabaseClient
+                    .from('escola_dados')
+                    .select('dados')
+                    .eq('id', 1)
+                    .single();
+                    
+                if (data && data.dados) {
+                    if (data.dados.students) window.students = data.dados.students;
+                    if (data.dados.studentGrades) window.studentGrades = data.dados.studentGrades;
+                    if (data.dados.attendanceState) window.attendanceState = data.dados.attendanceState;
+                    
+                    // Recarrega as tabelas visuais com os dados da nuvem
+                    const monthInput = document.getElementById('month-selector');
+                    if (monthInput && !document.getElementById('frequencia-view').classList.contains('hidden')) {
+                        window.generateTable(monthInput.value);
+                    }
+                    if (!document.getElementById('boletim-view').classList.contains('hidden')) {
+                        window.generateBoletimTable();
+                    }
+                }
+            } catch(e) {
+                console.error("Aviso Supabase (Ignorável se for o primeiro uso):", e.message || e);
+            }
+        }
+
+        loadDataFromCloud(); // Aciona o carregamento na inicialização
+
+        // --- FUNÇÕES DE SALVAMENTO ---
+        window.saveDataToCloud = async function() {
+            if (!window.cloudReady || !supabaseClient) {
+                throw new Error("Supabase não configurado.");
+            }
+            
+            const payload = {
+                students: window.students || [],
+                studentGrades: JSON.parse(JSON.stringify(window.studentGrades || {})),
+                attendanceState: JSON.parse(JSON.stringify(window.attendanceState || {}))
+            };
+            
+            // O upsert insere (se não existir) ou atualiza (se já existir) o registro de id 1
+            const { data, error } = await supabaseClient
+                .from('escola_dados')
+                .upsert({ id: 1, dados: payload });
+                
+            if (error) {
+                throw error;
+            }
+            return true;
+        };
+
+        window.saveAllData = async function() {
+            const result = { local: false, cloud: null };
+            // Salva Local
+            try {
+                localStorage.setItem(window.STORAGE_KEY, JSON.stringify({
+                    students: window.students,
+                    studentGrades: window.studentGrades,
+                    attendanceState: window.attendanceState
+                }));
+                result.local = true;
+            } catch (e) {
+                console.error("Erro ao salvar localmente:", e);
+            }
+            
+            // Salva Nuvem
+            if (window.cloudReady) {
+                try {
+                    await window.saveDataToCloud();
+                    result.cloud = true;
+                } catch (e) {
+                    result.cloud = false;
+                    console.error("Erro ao salvar na nuvem:", e);
+                }
+            }
+            return result;
+        };
+
+        // Comportamento visual e lógica do botão Salvar
+        window.handleSave = async function(btn) {
+            if (!btn || btn.disabled) return;
+            const originalHTML = btn.innerHTML;
+            const allColors = ['bg-green-600', 'hover:bg-green-700', 'bg-emerald-500', 'bg-amber-500', 'bg-red-500'];
+            const setColor = (cls) => {
+                btn.classList.remove(...allColors);
+                btn.classList.add(...cls.split(' '));
+            };
+
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> <span>Salvando...</span>';
+
+            const r = await window.saveAllData();
+            if (r.cloud === true) {
+                btn.innerHTML = '<i class="fa-solid fa-check mr-2"></i> <span>Salvo na Nuvem!</span>';
+                setColor('bg-emerald-500');
+            } else if (r.local && r.cloud === null) {
+                btn.innerHTML = '<i class="fa-solid fa-check mr-2"></i> <span>Salvo Localmente</span>';
+                setColor('bg-amber-500');
+            } else if (r.local) {
+                btn.innerHTML = '<i class="fa-solid fa-triangle-exclamation mr-2"></i> <span>Erro Nuvem (Salvo Local)</span>';
+                setColor('bg-amber-500');
+            } else {
+                btn.innerHTML = '<i class="fa-solid fa-triangle-exclamation mr-2"></i> <span>Erro ao salvar</span>';
+                setColor('bg-red-500');
+            }
+
+            setTimeout(() => {
+                btn.innerHTML = originalHTML;
+                setColor('bg-green-600 hover:bg-green-700');
+                btn.disabled = false;
+            }, 2500);
+        };
+
+        // --- LÓGICA DA TABELA DE FREQUÊNCIA ---
         window.generateTable = function(monthStr) {
             const [year, month] = monthStr.split('-');
             const daysInMonth = new Date(year, month, 0).getDate();
@@ -564,12 +644,10 @@
         }
 
         window.toggleAttendance = function(monthStr, student, day, isChecked) {
-            // Garantia extra de que a estrutura do mês e aluno existem antes de salvar
             if (!window.attendanceState[monthStr]) window.attendanceState[monthStr] = {};
             if (!window.attendanceState[monthStr][student]) window.attendanceState[monthStr][student] = {};
             
             window.attendanceState[monthStr][student][day] = isChecked;
-            window.saveDataToCloud();
             window.generateBoletimTable();
         }
 
@@ -579,7 +657,6 @@
                 if (!window.attendanceState[monthStr][student]) window.attendanceState[monthStr][student] = {};
                 window.attendanceState[monthStr][student][day] = true;
             });
-            window.saveDataToCloud();
             window.generateTable(monthStr); 
             window.generateBoletimTable(); 
         }
@@ -590,7 +667,6 @@
             if (name) {
                 window.students.push(name.toUpperCase());
                 input.value = '';
-                window.saveDataToCloud();
                 const currentMonth = document.getElementById('month-selector').value;
                 window.generateTable(currentMonth);
                 window.generateBoletimTable(); 
@@ -599,12 +675,12 @@
 
         window.removeStudent = function(index) {
             window.students.splice(index, 1);
-            window.saveDataToCloud();
             const currentMonth = document.getElementById('month-selector').value;
             window.generateTable(currentMonth);
             window.generateBoletimTable(); 
         }
 
+        // --- LÓGICA DO BOLETIM NUMÉRICO ---
         window.generateBoletimTable = function() {
             const turmaSelect = document.getElementById('boletim-turma-select');
             const is5thGrade = turmaSelect ? turmaSelect.value === '5' : true;
@@ -699,7 +775,6 @@
             if (!window.studentGrades[student]) window.studentGrades[student] = {};
             if (!window.studentGrades[student][currentBimestre]) window.studentGrades[student][currentBimestre] = {};
             window.studentGrades[student][currentBimestre][subject] = value;
-            window.saveDataToCloud();
         }
 
         window.updateEval = function(student, evaluation, value, index) {
@@ -707,7 +782,6 @@
             if (!window.studentGrades[student]) window.studentGrades[student] = {};
             if (!window.studentGrades[student][currentBimestre]) window.studentGrades[student][currentBimestre] = {};
             window.studentGrades[student][currentBimestre][evaluation] = value;
-            window.saveDataToCloud();
             
             const mediaVal = window.calculateMedia(student);
             const mediaSpan = document.getElementById(`media-${index}`);
@@ -744,6 +818,7 @@
             return count > 0 ? (sum / count) : null;
         }
 
+        // Event Listeners (Print, Mensalidades, etc)
         const boletimTurmaSelect = document.getElementById('boletim-turma-select');
         const boletimBimestreSelect = document.getElementById('boletim-bimestre-select');
         
@@ -780,6 +855,11 @@
             window.generateTable(monthInput.value);
         }
 
+        // Inicia Botões de Salvar
+        document.querySelectorAll('.save-data-btn').forEach(btn => {
+            btn.addEventListener('click', () => window.handleSave(btn));
+        });
+
         const addStudentBtn = document.getElementById('add-student-btn');
         if (addStudentBtn) {
             addStudentBtn.addEventListener('click', window.addStudent);
@@ -794,6 +874,7 @@
             });
         }
 
+        // Navegação entre Telas
         window.showView = function(viewName) {
             document.getElementById('default-view').classList.add('hidden');
             document.getElementById('frequencia-view').classList.add('hidden');
