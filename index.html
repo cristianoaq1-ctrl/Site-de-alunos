@@ -380,33 +380,36 @@
         async function initCloud() {
             try {
                 const config = JSON.parse(firebaseConfigStr);
-                if (!config || Object.keys(config).length === 0) return; // Sem config, funciona apenas localmente
+                if (!config || Object.keys(config).length === 0) return;
                 
                 const app = initializeApp(config);
                 const db = getFirestore(app);
                 const auth = getAuth(app);
                 
-                // Autenticação automática do usuário no ambiente
                 const token = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-                if (token) {
-                    await signInWithCustomToken(auth, token);
-                } else {
+                try {
+                    if (token) {
+                        await signInWithCustomToken(auth, token);
+                    } else {
+                        await signInAnonymously(auth);
+                    }
+                } catch (authErr) {
+                    console.warn("Token falhou, usando modo anônimo", authErr);
                     await signInAnonymously(auth);
                 }
                 
                 const userId = auth.currentUser?.uid;
                 if (!userId) return;
 
-                // Caminho rigoroso para salvar os dados privados desta escola
                 const docRef = doc(db, 'artifacts', appId, 'users', userId, 'school_data', 'main_data');
 
-                // Expõe a função de salvar para a aplicação utilizar
                 window.saveDataToCloud = async function() {
                     try {
+                        // O JSON.parse(JSON.stringify) blinda contra qualquer erro de "undefined" que o Firebase recusa
                         await setDoc(docRef, {
-                            students: window.students,
-                            studentGrades: window.studentGrades,
-                            attendanceState: window.attendanceState
+                            students: window.students || [],
+                            studentGrades: JSON.parse(JSON.stringify(window.studentGrades || {})),
+                            attendanceState: JSON.parse(JSON.stringify(window.attendanceState || {}))
                         });
                         console.log("Dados salvos na nuvem com sucesso!");
                     } catch(e) {
@@ -414,15 +417,16 @@
                     }
                 };
 
-                // Ouve por mudanças na nuvem (se acessar de outro PC, atualiza sozinho)
                 onSnapshot(docRef, (snapshot) => {
+                    // Impede que a tela recarregue e atrapalhe caso você esteja clicando rápido
+                    if (snapshot.metadata && snapshot.metadata.hasPendingWrites) return;
+
                     if (snapshot.exists()) {
                         const data = snapshot.data();
                         if (data.students) window.students = data.students;
                         if (data.studentGrades) window.studentGrades = data.studentGrades;
                         if (data.attendanceState) window.attendanceState = data.attendanceState;
                         
-                        // Atualiza a tela se as funções estiverem prontas
                         if(typeof window.generateTable === 'function' && typeof window.generateBoletimTable === 'function') {
                             const monthInput = document.getElementById('month-selector');
                             if (monthInput && document.getElementById('frequencia-view').classList.contains('hidden') === false) {
@@ -560,6 +564,10 @@
         }
 
         window.toggleAttendance = function(monthStr, student, day, isChecked) {
+            // Garantia extra de que a estrutura do mês e aluno existem antes de salvar
+            if (!window.attendanceState[monthStr]) window.attendanceState[monthStr] = {};
+            if (!window.attendanceState[monthStr][student]) window.attendanceState[monthStr][student] = {};
+            
             window.attendanceState[monthStr][student][day] = isChecked;
             window.saveDataToCloud();
             window.generateBoletimTable();
