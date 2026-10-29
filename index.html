@@ -39,7 +39,6 @@
     </script>
 
     <style>
-        /* Custom scrollbar for the sidebar */
         .sidebar-scroll::-webkit-scrollbar {
             width: 6px;
         }
@@ -57,7 +56,6 @@
     <!-- Sidebar -->
     <aside id="sidebar" class="w-80 h-full bg-brand-bg border-r border-brand-border flex flex-col shadow-[4px_0_24px_rgba(0,0,0,0.02)] absolute md:relative z-30 transition-all duration-300 ease-in-out flex-shrink-0 print:hidden">
         
-        <!-- Logo Area -->
         <div class="p-6 border-b border-brand-border flex items-center space-x-4 shrink-0 bg-brand-bg">
             <div class="w-12 h-12 bg-brand-purple rounded-lg flex items-center justify-center text-white text-2xl shadow-sm">
                 <i class="fa-solid fa-graduation-cap"></i>
@@ -68,10 +66,7 @@
             </div>
         </div>
 
-        <!-- Sidebar Content (Scrollable) -->
         <div class="flex-1 overflow-y-auto sidebar-scroll p-6 pb-20">
-            
-            <!-- 1. DASHBOARD -->
             <div class="mb-8">
                 <div class="flex items-center space-x-3 text-brand-purple text-xs font-bold uppercase tracking-wide mb-4">
                     <i class="fa-solid fa-table-cells-large text-base w-5 text-center"></i>
@@ -85,7 +80,6 @@
                 </div>
             </div>
 
-            <!-- 2. RELATÓRIOS -->
             <div class="mb-8">
                 <div class="flex items-center space-x-3 text-brand-purple text-xs font-bold uppercase tracking-wide mb-4">
                     <i class="fa-solid fa-chart-column text-base w-5 text-center"></i>
@@ -107,7 +101,6 @@
                 </div>
             </div>
 
-            <!-- 3. INSTITUCIONAL -->
             <div class="mb-8">
                 <div class="flex items-center space-x-3 text-brand-purple text-xs font-bold uppercase tracking-wide mb-4">
                     <i class="fa-solid fa-building-columns text-base w-5 text-center"></i>
@@ -129,7 +122,6 @@
                 </div>
             </div>
 
-            <!-- 4. CADASTROS -->
             <div class="mb-8">
                 <div class="flex items-center space-x-3 text-brand-purple text-xs font-bold uppercase tracking-wide mb-4">
                     <i class="fa-solid fa-user-plus text-base w-5 text-center"></i>
@@ -163,7 +155,6 @@
                 </div>
             </div>
 
-            <!-- 5. CALENDÁRIO -->
             <div class="mb-4">
                 <div class="flex items-center space-x-3 text-brand-purple text-xs font-bold uppercase tracking-wide mb-4">
                     <i class="fa-regular fa-calendar text-base w-5 text-center"></i>
@@ -180,33 +171,27 @@
                     </a>
                 </div>
             </div>
-
         </div>
     </aside>
 
     <!-- Main Workspace Area -->
     <div class="flex-1 flex flex-col min-w-0 h-full relative print:block print:w-full print:h-auto print:overflow-visible">
         
-        <!-- Top Navigation Bar -->
         <header class="h-20 bg-brand-headerBg border-b border-brand-border px-6 flex items-center justify-between shrink-0 z-20 print:hidden">
             <div class="flex items-center space-x-5">
-                <!-- Hamburger Button -->
                 <button id="toggleBtn" class="w-12 h-12 rounded-full bg-brand-btnBg flex items-center justify-center text-brand-dark hover:bg-opacity-80 transition-colors shadow-sm outline-none">
                     <i class="fa-solid fa-bars text-xl"></i>
                 </button>
                 <h2 class="text-xl font-bold text-brand-dark hidden sm:block">Sistema Pereira</h2>
             </div>
             
-            <!-- User Profile Photo -->
             <div class="w-12 h-12 rounded-full bg-brand-dark flex items-center justify-center text-white shadow-md cursor-pointer hover:bg-opacity-90 transition-opacity">
                 <i class="fa-solid fa-user text-xl"></i>
             </div>
         </header>
 
-        <!-- Main Content Area -->
         <main class="flex-1 bg-white flex flex-col p-6 overflow-hidden relative print:block print:overflow-visible print:p-0">
             
-            <!-- Default Placeholder View -->
             <div id="default-view" class="flex-1 flex flex-col items-center justify-center hidden print:hidden">
                 <div class="text-center text-gray-400">
                     <i class="fa-solid fa-hand-pointer text-4xl mb-4 opacity-50"></i>
@@ -224,7 +209,6 @@
                     </div>
                     
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 w-full max-w-5xl px-4">
-                        <!-- Substitua o href="#" pelo link do Google Drive correspondente -->
                         <a href="#" target="_blank" class="bg-purple-100 hover:bg-purple-200 transition-colors rounded-2xl p-10 flex flex-col items-center justify-center space-y-4 shadow-md hover:shadow-lg group">
                             <i class="fa-solid fa-folder text-[#fcd34d] text-7xl drop-shadow-sm group-hover:scale-105 transition-transform"></i>
                             <span class="text-purple-900 font-bold text-xl tracking-wide">Atividades</span>
@@ -270,8 +254,6 @@
 
             <!-- Frequência View -->
             <div id="frequencia-view" class="flex-1 flex flex-col h-full hidden print:block print:h-auto print:overflow-visible">
-                
-                <!-- Top Controls -->
                 <div class="flex flex-wrap items-center justify-between mb-4 gap-4 print:hidden">
                     <div class="flex items-center space-x-2">
                         <label class="font-bold text-sm text-gray-700">Turma:</label>
@@ -299,24 +281,16 @@
                     </div>
                 </div>
 
-                <!-- Scrollable Table Container -->
                 <div class="flex-1 overflow-auto border border-gray-300 rounded shadow-sm relative custom-scrollbar print:overflow-visible print:border-none print:shadow-none print:block">
                     <table class="w-full text-sm text-center border-collapse whitespace-nowrap print:w-full">
-                        <thead id="frequencia-thead" class="bg-[#1e293b] text-white sticky top-0 z-20 shadow-sm">
-                            <!-- Columns generated via JS -->
-                        </thead>
-                        <tbody id="frequencia-tbody" class="bg-white text-gray-700">
-                            <!-- Rows generated via JS -->
-                        </tbody>
+                        <thead id="frequencia-thead" class="bg-[#1e293b] text-white sticky top-0 z-20 shadow-sm"></thead>
+                        <tbody id="frequencia-tbody" class="bg-white text-gray-700"></tbody>
                     </table>
                 </div>
-
             </div>
 
             <!-- Boletim Numérico View -->
             <div id="boletim-view" class="flex-1 flex flex-col h-full hidden print:block print:h-auto print:overflow-visible">
-                
-                <!-- Top Controls -->
                 <div class="flex flex-wrap items-center justify-between mb-4 gap-4 print:hidden">
                     <div class="flex items-center space-x-2">
                         <label class="font-bold text-sm text-gray-700">Turma:</label>
@@ -348,7 +322,6 @@
                     </div>
                 </div>
 
-                <!-- Print Header -->
                 <div id="boletim-print-header" class="hidden print:block mb-6 text-center text-black">
                     <h1 class="text-2xl font-bold uppercase tracking-wide">Sistema Pereira</h1>
                     <h2 class="text-lg font-semibold mt-1">Boletim Numérico</h2>
@@ -356,14 +329,10 @@
                     <hr class="border-t-2 border-black mt-4 mb-4">
                 </div>
 
-                <!-- Scrollable Table Container -->
                 <div class="flex-1 overflow-auto border border-gray-300 rounded shadow-sm relative custom-scrollbar print:overflow-visible print:border-none print:shadow-none print:block print:w-full">
                     <table class="w-full text-sm text-center border-collapse whitespace-nowrap print:w-full">
-                        <thead id="boletim-thead" class="bg-[#1e293b] text-white sticky top-0 z-20 shadow-sm print:bg-gray-800 print:text-white">
-                        </thead>
-                        <tbody id="boletim-tbody" class="bg-white text-gray-700">
-                            <!-- Rows generated via JS -->
-                        </tbody>
+                        <thead id="boletim-thead" class="bg-[#1e293b] text-white sticky top-0 z-20 shadow-sm print:bg-gray-800 print:text-white"></thead>
+                        <tbody id="boletim-tbody" class="bg-white text-gray-700"></tbody>
                     </table>
                 </div>
             </div>
@@ -374,10 +343,67 @@
     <!-- Mobile Overlay for Sidebar -->
     <div id="sidebarOverlay" class="fixed inset-0 bg-black/30 z-20 hidden transition-opacity cursor-pointer"></div>
 
-    <!-- SDK do Supabase -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Supabase Integration -->
+    <script type="module">
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
-    <!-- Sidebar Toggle Script & Lógica Principal -->
+        const supabaseUrl = 'https://qpnpyssmvrjnblomfefm.supabase.co';
+        const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFwbnB5eXNtdnJqbmJsb21mZWZtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk4NzIxOTEsImV4cCI6MjEwNTQ0ODE5MX0.nFnlkTU_scEsODme4kaDettb0hRSVUeUZgtpmd9zFAM';
+
+        const supabaseClient = createClient(supabaseUrl, supabaseAnonKey);
+        window.supabaseClient = supabaseClient;
+        window.cloudReady = true;
+
+        window.saveDataToCloud = async function() {
+            const payload = {
+                id: 1,
+                dados: {
+                    students: window.students || [],
+                    studentGrades: JSON.parse(JSON.stringify(window.studentGrades || {})),
+                    attendanceState: JSON.parse(JSON.stringify(window.attendanceState || {}))
+                }
+            };
+
+            const { error } = await supabaseClient
+                .from('escola_dados')
+                .upsert(payload);
+
+            if (error) {
+                console.error("Erro Supabase:", error);
+                throw error;
+            }
+        };
+
+        async function loadDataFromCloud() {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('escola_dados')
+                    .select('dados')
+                    .eq('id', 1)
+                    .single();
+
+                if (data && data.dados) {
+                    if (data.dados.students) window.students = data.dados.students;
+                    if (data.dados.studentGrades) window.studentGrades = data.dados.studentGrades;
+                    if (data.dados.attendanceState) window.attendanceState = data.dados.attendanceState;
+
+                    const monthInput = document.getElementById('month-selector');
+                    if (monthInput && typeof window.generateTable === 'function') {
+                        window.generateTable(monthInput.value);
+                    }
+                    if (typeof window.generateBoletimTable === 'function') {
+                        window.generateBoletimTable();
+                    }
+                }
+            } catch (e) {
+                console.log("Nenhum dado na nuvem ainda ou tabela vazia.");
+            }
+        }
+
+        loadDataFromCloud();
+    </script>
+
+    <!-- Main Logic -->
     <script>
         const sidebar = document.getElementById('sidebar');
         const toggleBtn = document.getElementById('toggleBtn');
@@ -409,7 +435,6 @@
         window.addEventListener('resize', handleResize);
         handleResize();
 
-        // --- Variáveis Globais de Estado ---
         window.students = [
             "ANNA LUYZA DA SILVA TOMAZELLI",
             "ARTHUR GENILSON DA SILVA BATISTA",
@@ -422,125 +447,19 @@
         ];
         window.studentGrades = {}; 
         window.attendanceState = {}; 
-        window.STORAGE_KEY = 'sistemaPereiraData';
-        
-        // --- CONFIGURAÇÃO DO SUPABASE ---
-        const SUPABASE_URL = 'https://qpnpyssmvrjnblomfefm.supabase.co'; 
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFwbnB5eXNtdnJqbmJsb21mZWZtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk4NzIxOTEsImV4cCI6MjEwNTQ0ODE5MX0.nFnlkTU_scEsODme4kaDettb0hRSVUeUZgtpmd9zFAM';
-        
-        let supabaseClient = null;
-        window.cloudReady = false;
-
-        try {
-            // Prevenção de erro: só inicia o Supabase se a URL tiver sido alterada da URL padrão de exemplo
-            if (SUPABASE_URL.startsWith('https://') && SUPABASE_URL !== 'https://seu-projeto.supabase.co') {
-                supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-                window.cloudReady = true;
-                console.log("Supabase configurado com sucesso!");
-            } else {
-                console.warn("⚠️ URL do Supabase não foi inserida ou é inválida. O sistema rodará apenas com armazenamento local.");
-            }
-        } catch(e) {
-            console.error("Erro ao iniciar o Supabase:", e);
-        }
-
-        // --- CARREGAMENTO INICIAL DE DADOS ---
-        // Carrega dados locais (fallback)
-        try {
-            const saved = localStorage.getItem(window.STORAGE_KEY);
-            if (saved) {
-                const data = JSON.parse(saved);
-                if (data.students) window.students = data.students;
-                if (data.studentGrades) window.studentGrades = data.studentGrades;
-                if (data.attendanceState) window.attendanceState = data.attendanceState;
-            }
-        } catch (e) {
-            console.warn("Não foi possível carregar os dados locais:", e);
-        }
-
-        // Tenta carregar dados da nuvem (se o Supabase estiver online)
-        async function loadDataFromCloud() {
-            if (!window.cloudReady || !supabaseClient) return;
-            
-            try {
-                const { data, error } = await supabaseClient
-                    .from('escola_dados')
-                    .select('dados')
-                    .eq('id', 1)
-                    .single();
-                    
-                if (data && data.dados) {
-                    if (data.dados.students) window.students = data.dados.students;
-                    if (data.dados.studentGrades) window.studentGrades = data.dados.studentGrades;
-                    if (data.dados.attendanceState) window.attendanceState = data.dados.attendanceState;
-                    
-                    // Recarrega as tabelas visuais com os dados da nuvem
-                    const monthInput = document.getElementById('month-selector');
-                    if (monthInput && !document.getElementById('frequencia-view').classList.contains('hidden')) {
-                        window.generateTable(monthInput.value);
-                    }
-                    if (!document.getElementById('boletim-view').classList.contains('hidden')) {
-                        window.generateBoletimTable();
-                    }
-                }
-            } catch(e) {
-                console.error("Aviso Supabase (Ignorável se for o primeiro uso):", e.message || e);
-            }
-        }
-
-        loadDataFromCloud(); // Aciona o carregamento na inicialização
-
-        // --- FUNÇÕES DE SALVAMENTO ---
-        window.saveDataToCloud = async function() {
-            if (!window.cloudReady || !supabaseClient) {
-                throw new Error("Supabase não configurado.");
-            }
-            
-            const payload = {
-                students: window.students || [],
-                studentGrades: JSON.parse(JSON.stringify(window.studentGrades || {})),
-                attendanceState: JSON.parse(JSON.stringify(window.attendanceState || {}))
-            };
-            
-            // O upsert insere (se não existir) ou atualiza (se já existir) o registro de id 1
-            const { data, error } = await supabaseClient
-                .from('escola_dados')
-                .upsert({ id: 1, dados: payload });
-                
-            if (error) {
-                throw error;
-            }
-            return true;
-        };
+        window.cloudReady = true;
 
         window.saveAllData = async function() {
-            const result = { local: false, cloud: null };
-            // Salva Local
+            const result = { cloud: null };
             try {
-                localStorage.setItem(window.STORAGE_KEY, JSON.stringify({
-                    students: window.students,
-                    studentGrades: window.studentGrades,
-                    attendanceState: window.attendanceState
-                }));
-                result.local = true;
+                await window.saveDataToCloud();
+                result.cloud = true;
             } catch (e) {
-                console.error("Erro ao salvar localmente:", e);
-            }
-            
-            // Salva Nuvem
-            if (window.cloudReady) {
-                try {
-                    await window.saveDataToCloud();
-                    result.cloud = true;
-                } catch (e) {
-                    result.cloud = false;
-                    console.error("Erro ao salvar na nuvem:", e);
-                }
+                result.cloud = false;
             }
             return result;
         };
 
-        // Comportamento visual e lógica do botão Salvar
         window.handleSave = async function(btn) {
             if (!btn || btn.disabled) return;
             const originalHTML = btn.innerHTML;
@@ -557,14 +476,8 @@
             if (r.cloud === true) {
                 btn.innerHTML = '<i class="fa-solid fa-check mr-2"></i> <span>Salvo na Nuvem!</span>';
                 setColor('bg-emerald-500');
-            } else if (r.local && r.cloud === null) {
-                btn.innerHTML = '<i class="fa-solid fa-check mr-2"></i> <span>Salvo Localmente</span>';
-                setColor('bg-amber-500');
-            } else if (r.local) {
-                btn.innerHTML = '<i class="fa-solid fa-triangle-exclamation mr-2"></i> <span>Erro Nuvem (Salvo Local)</span>';
-                setColor('bg-amber-500');
             } else {
-                btn.innerHTML = '<i class="fa-solid fa-triangle-exclamation mr-2"></i> <span>Erro ao salvar</span>';
+                btn.innerHTML = '<i class="fa-solid fa-triangle-exclamation mr-2"></i> <span>Erro ao Salvar</span>';
                 setColor('bg-red-500');
             }
 
@@ -575,7 +488,6 @@
             }, 2500);
         };
 
-        // --- LÓGICA DA TABELA DE FREQUÊNCIA ---
         window.generateTable = function(monthStr) {
             const [year, month] = monthStr.split('-');
             const daysInMonth = new Date(year, month, 0).getDate();
@@ -645,7 +557,6 @@
         window.toggleAttendance = function(monthStr, student, day, isChecked) {
             if (!window.attendanceState[monthStr]) window.attendanceState[monthStr] = {};
             if (!window.attendanceState[monthStr][student]) window.attendanceState[monthStr][student] = {};
-            
             window.attendanceState[monthStr][student][day] = isChecked;
             window.generateBoletimTable();
         }
@@ -679,7 +590,6 @@
             window.generateBoletimTable(); 
         }
 
-        // --- LÓGICA DO BOLETIM NUMÉRICO ---
         window.generateBoletimTable = function() {
             const turmaSelect = document.getElementById('boletim-turma-select');
             const is5thGrade = turmaSelect ? turmaSelect.value === '5' : true;
@@ -728,11 +638,9 @@
                 const rowClass = isEven ? 'bg-white' : 'bg-gray-50';
 
                 tbodyHtml += `<tr class="border-b border-gray-200 hover:bg-gray-100 group transition-colors">`;
-                
                 tbodyHtml += `<td class="sticky left-0 ${rowClass} group-hover:bg-gray-100 z-10 p-4 text-left border-r border-gray-200 font-medium whitespace-nowrap shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)] transition-colors">
                                 <span class="truncate mr-4 text-brand-dark">${student}</span>
                               </td>`;
-                
                 tbodyHtml += `<td class="p-2 border-r border-gray-200 bg-[#fce8e6] text-[#c92a2a] font-bold text-center w-16 text-base shadow-[inset_0_0_2px_rgba(201,42,42,0.1)]">
                                 ${faltas}
                               </td>`;
@@ -817,7 +725,6 @@
             return count > 0 ? (sum / count) : null;
         }
 
-        // Event Listeners (Print, Mensalidades, etc)
         const boletimTurmaSelect = document.getElementById('boletim-turma-select');
         const boletimBimestreSelect = document.getElementById('boletim-bimestre-select');
         
@@ -854,7 +761,6 @@
             window.generateTable(monthInput.value);
         }
 
-        // Inicia Botões de Salvar
         document.querySelectorAll('.save-data-btn').forEach(btn => {
             btn.addEventListener('click', () => window.handleSave(btn));
         });
@@ -873,7 +779,6 @@
             });
         }
 
-        // Navegação entre Telas
         window.showView = function(viewName) {
             document.getElementById('default-view').classList.add('hidden');
             document.getElementById('frequencia-view').classList.add('hidden');
