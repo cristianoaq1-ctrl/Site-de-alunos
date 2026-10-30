@@ -10,6 +10,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Indie+Flower&family=Patrick+Hand&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     
+    <!-- Fonte LaTeX para o PDF de Anotações -->
+    <style>@import url('https://cdn.jsdelivr.net/gh/dreampulse/computer-modern-web-font@master/fonts.css');</style>
+
     <!-- FontAwesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -76,6 +79,39 @@
             from { opacity: 0; transform: translateY(5px); }
             to { opacity: 1; transform: translateY(0); }
         }
+
+        /* Estilização customizada para os sliders da calculadora (input type="range") */
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 24px;
+            width: 24px;
+            border-radius: 50%;
+            background: #2563eb; /* blue-600 */
+            cursor: pointer;
+            margin-top: -8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 8px;
+            cursor: pointer;
+            background: #d1d5db; /* gray-300 */
+            border-radius: 4px;
+        }
+        .dark input[type=range]::-webkit-slider-runnable-track {
+            background: #4b5563; /* gray-600 */
+        }
+        input[type=range]:focus::-webkit-slider-runnable-track {
+            background: #9ca3af; /* gray-400 */
+        }
+        .dark input[type=range]:focus::-webkit-slider-runnable-track {
+            background: #6b7280; /* gray-500 */
+        }
     </style>
 </head>
 <body class="bg-gray-100 flex h-screen antialiased text-brand-text overflow-hidden print:bg-white print:overflow-visible print:h-auto transition-colors duration-300">
@@ -134,13 +170,13 @@
                     <span>Institucional</span>
                 </div>
                 <div class="flex flex-col space-y-2.5">
-                    <a href="#" class="flex items-center space-x-4 w-full px-5 py-3 rounded-[24px] border border-brand-border bg-transparent text-[15px] font-medium hover:bg-white transition-all">
-                        <i class="fa-solid fa-book-open text-gray-500 w-5 text-center text-lg"></i>
-                        <span>Cursos</span>
+                    <a href="#" onclick="showView('calculadora'); return false;" class="flex items-center space-x-4 w-full px-5 py-3 rounded-[24px] border border-brand-border bg-transparent text-[15px] font-medium hover:bg-white transition-all">
+                        <i class="fa-solid fa-calculator text-gray-500 w-5 text-center text-lg"></i>
+                        <span>Calculadora de Notas</span>
                     </a>
-                    <a href="#" class="flex items-center space-x-4 w-full px-5 py-3 rounded-[24px] border border-brand-border bg-transparent text-[15px] font-medium hover:bg-white transition-all">
+                    <a href="#" onclick="showView('anotacoes'); return false;" class="flex items-center space-x-4 w-full px-5 py-3 rounded-[24px] border border-brand-border bg-transparent text-[15px] font-medium hover:bg-white transition-all">
                         <i class="fa-solid fa-list-ul text-gray-500 w-5 text-center text-lg"></i>
-                        <span>Séries</span>
+                        <span>Anotações</span>
                     </a>
                     <a href="#" class="flex items-center space-x-4 w-full px-5 py-3 rounded-[24px] border border-brand-border bg-transparent text-[15px] font-medium hover:bg-white transition-all">
                         <i class="fa-solid fa-list-check text-gray-500 w-5 text-center text-lg"></i>
@@ -198,12 +234,177 @@
                 </div>
             </div>
 
+            <!-- Diário de Observações (Anotações) View -->
+            <div id="anotacoes-view" class="flex-1 flex flex-col h-full hidden print:block overflow-y-auto custom-scrollbar">
+                <div class="max-w-6xl mx-auto w-full grid grid-cols-1 lg:grid-cols-3 gap-6 py-6 px-2">
+                    
+                    <div class="lg:col-span-1 bg-white dark:bg-slate-800 p-6 rounded-lg shadow-md border-t-4 border-blue-600 dark:border-blue-500 h-fit">
+                        <h2 class="text-xl font-bold mb-4 text-blue-700 dark:text-blue-400">Nova Observação</h2>
+                        
+                        <form id="obsForm" class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Turma</label>
+                                <select id="turma" class="mt-1 block w-full rounded-md border-gray-300 dark:border-slate-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border bg-white dark:bg-slate-700 dark:text-white" required>
+                                    <option value="" disabled selected>Selecione...</option>
+                                    <option value="5º Ano">5º Ano</option>
+                                    <option value="6º Ano">6º Ano</option>
+                                    <option value="8º Ano">8º Ano</option>
+                                    <option value="9º Ano">9º Ano</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nome do Aluno</label>
+                                <input type="text" id="aluno" class="mt-1 block w-full rounded-md border-gray-300 dark:border-slate-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border bg-white dark:bg-slate-700 dark:text-white placeholder:text-gray-400" placeholder="Ex: João Silva" required>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Categoria</label>
+                                <select id="categoria" class="mt-1 block w-full rounded-md border-gray-300 dark:border-slate-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border bg-white dark:bg-slate-700 dark:text-white" required>
+                                    <option value="Participação">Participação</option>
+                                    <option value="Comportamento">Comportamento</option>
+                                    <option value="Dificuldade (Conteúdo)">Dificuldade (Conteúdo)</option>
+                                    <option value="Elogio">Elogio</option>
+                                    <option value="Outros">Outros</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Observação</label>
+                                <textarea id="textoObs" rows="3" class="mt-1 block w-full rounded-md border-gray-300 dark:border-slate-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border bg-white dark:bg-slate-700 dark:text-white placeholder:text-gray-400" placeholder="Descreva o que ocorreu..." required></textarea>
+                            </div>
+
+                            <button type="submit" id="btnSalvarObs" class="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded hover:bg-blue-700 transition">
+                                Salvar Observação
+                            </button>
+                        </form>
+                    </div>
+
+                    <div class="lg:col-span-2 bg-white dark:bg-slate-800 p-6 rounded-lg shadow-md flex flex-col h-full min-h-[600px]">
+                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-2 border-b dark:border-slate-700 pb-4 shrink-0">
+                            <h2 class="text-xl font-bold text-gray-700 dark:text-gray-200">Registos Recentes</h2>
+                            
+                            <div class="flex items-center gap-2 w-full md:w-auto mt-2 md:mt-0">
+                                <button class="save-data-btn w-full md:w-auto bg-green-600 text-white text-sm font-bold py-2 px-4 rounded hover:bg-green-700 transition flex justify-center items-center gap-2">
+                                    <i class="fa-solid fa-cloud-arrow-up"></i>
+                                    Salvar Nuvem
+                                </button>
+                                <button onclick="gerarPDFObservacoes()" class="w-full md:w-auto bg-red-600 text-white text-sm font-bold py-2 px-4 rounded hover:bg-red-700 transition flex justify-center items-center gap-2">
+                                    <i class="fa-solid fa-file-pdf"></i>
+                                    Exportar PDF
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 w-full mb-4 shrink-0">
+                            <input type="text" id="buscaAlunoObs" placeholder="Buscar por aluno..." class="text-sm border-gray-300 dark:border-slate-600 rounded-md p-2 border w-full sm:w-1/2 focus:border-blue-500 focus:ring-blue-500 bg-white dark:bg-slate-700 dark:text-white placeholder:text-gray-400">
+                            
+                            <select id="filtroTurmaObs" class="text-sm border-gray-300 dark:border-slate-600 rounded-md p-2 border w-full sm:w-1/2 focus:border-blue-500 focus:ring-blue-500 bg-white dark:bg-slate-700 dark:text-white">
+                                <option value="Todas">Todas as Turmas</option>
+                                <option value="5º Ano">5º Ano</option>
+                                <option value="6º Ano">6º Ano</option>
+                                <option value="8º Ano">8º Ano</option>
+                                <option value="9º Ano">9º Ano</option>
+                            </select>
+                        </div>
+
+                        <div id="listaObservacoes" class="flex-1 overflow-y-auto pr-2 custom-scrollbar space-y-4">
+                            <p class="text-gray-500 dark:text-gray-400 text-center italic mt-10">A carregar observações...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Calculadora de Notas View -->
+            <div id="calculadora-view" class="flex-1 flex flex-col h-full hidden print:block overflow-y-auto custom-scrollbar">
+                <div class="flex flex-col items-center py-6 px-2 sm:px-4 w-full h-full">
+                    <div class="max-w-3xl w-full space-y-8">
+                        
+                        <header class="text-center">
+                            <h1 class="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white tracking-tight">Calculadora de Notas</h1>
+                            <p class="text-gray-500 dark:text-gray-400 mt-2 text-sm md:text-base">Correção rápida para prova de 22 questões</p>
+                        </header>
+
+                        <main class="bg-white dark:bg-slate-800 rounded-2xl shadow-xl overflow-hidden border border-gray-100 dark:border-slate-700">
+                            <!-- Destaque da Nota Final -->
+                            <div class="bg-blue-50 dark:bg-blue-900/20 py-8 px-6 text-center border-b border-blue-100 dark:border-blue-800/30">
+                                <h2 class="text-sm font-semibold text-blue-800 dark:text-blue-300 uppercase tracking-wider mb-2">Nota Final (0 a 10)</h2>
+                                <div class="flex justify-center items-baseline text-blue-600 dark:text-blue-400">
+                                    <span id="gradeDisplay" class="text-7xl font-bold tracking-tighter">5,00</span>
+                                </div>
+                            </div>
+
+                            <div class="p-6 md:p-8 space-y-8">
+                                
+                                <!-- Controle de Porcentagem -->
+                                <div class="space-y-4">
+                                    <div class="flex justify-between items-center">
+                                        <label for="percentInput" class="text-base font-medium text-gray-700 dark:text-gray-200">Porcentagem de Acertos (%)</label>
+                                        <div class="relative">
+                                            <input type="number" id="percentInput" value="50.0" min="0" max="100" step="0.1" 
+                                                class="w-24 text-right pr-6 pl-2 py-1 border border-gray-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all font-semibold text-gray-700 dark:text-white">
+                                            <span class="absolute right-2 top-1.5 text-gray-400 font-semibold">%</span>
+                                        </div>
+                                    </div>
+                                    <input type="range" id="percentSlider" min="0" max="100" step="0.1" value="50.0">
+                                    <div class="flex justify-between text-xs text-gray-400 font-medium">
+                                        <span>0%</span>
+                                        <span>50%</span>
+                                        <span>100%</span>
+                                    </div>
+                                </div>
+
+                                <hr class="border-gray-100 dark:border-slate-700">
+
+                                <!-- Controle de Acertos (de 22) -->
+                                <div class="space-y-4">
+                                    <div class="flex justify-between items-center">
+                                        <label for="hitsInput" class="text-base font-medium text-gray-700 dark:text-gray-200">Número de Acertos (de 22)</label>
+                                        <div class="relative">
+                                            <input type="number" id="hitsInput" value="11" min="0" max="22" step="1" 
+                                                class="w-24 text-right pr-8 pl-2 py-1 border border-gray-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all font-semibold text-gray-700 dark:text-white">
+                                            <span class="absolute right-2 top-1.5 text-gray-400 font-semibold">/22</span>
+                                        </div>
+                                    </div>
+                                    <input type="range" id="hitsSlider" min="0" max="22" step="1" value="11">
+                                    <div class="flex justify-between text-xs text-gray-400 font-medium">
+                                        <span>0 acertos</span>
+                                        <span>11 acertos</span>
+                                        <span>22 acertos</span>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </main>
+
+                        <section class="bg-white dark:bg-slate-800 rounded-2xl shadow-md border border-gray-100 dark:border-slate-700 overflow-hidden mt-8">
+                            <div class="px-6 py-4 border-b border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800/50">
+                                <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Tabela de Referência Rápida</h3>
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full divide-y divide-gray-200 dark:divide-slate-700 text-sm">
+                                    <thead class="bg-gray-50 dark:bg-slate-800/50">
+                                        <tr>
+                                            <th scope="col" class="px-6 py-3 text-left font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Acertos</th>
+                                            <th scope="col" class="px-6 py-3 text-center font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Porcentagem</th>
+                                            <th scope="col" class="px-6 py-3 text-right font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Nota Final</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="calcTableBody" class="bg-white dark:bg-slate-800 divide-y divide-gray-100 dark:divide-slate-700">
+                                        <!-- Linhas geradas por JavaScript -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </section>
+
+                    </div>
+                </div>
+            </div>
+
             <!-- Caderno / Listar Conteúdo View -->
             <div id="caderno-view" class="flex-1 flex flex-col h-full hidden print:block">
-                
                 <!-- Caderno Toolbar -->
                 <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-t-lg px-4 py-3 shadow-sm flex flex-wrap justify-between items-center gap-4 shrink-0">
-                    
                     <div class="flex items-center space-x-3">
                         <div class="w-10 h-10 rounded-xl bg-amber-600 flex items-center justify-center text-white shadow-md">
                             <i class="fa-solid fa-book-open text-xl"></i>
@@ -225,7 +426,6 @@
 
                     <!-- Controls Toolbar -->
                     <div class="flex flex-wrap items-center gap-2">
-                        <!-- Paper Theme Selector -->
                         <div class="flex items-center bg-slate-100 dark:bg-slate-700 p-1 rounded-lg border border-slate-200 dark:border-slate-600 text-xs">
                             <span class="px-2 text-slate-500 dark:text-slate-300 font-medium hidden lg:inline">Papel:</span>
                             <button onclick="setPaperColor('classic')" title="Amarelado Antigo" class="w-6 h-6 rounded bg-[#fbf0d9] border border-amber-200 shadow-sm hover:scale-110 transition-transform m-0.5"></button>
@@ -233,28 +433,20 @@
                             <button onclick="setPaperColor('pink')" title="Rosa Pastel" class="w-6 h-6 rounded bg-[#fdf2f4] border border-pink-200 shadow-sm hover:scale-110 transition-transform m-0.5"></button>
                             <button onclick="setPaperColor('mint')" title="Verde Menta" class="w-6 h-6 rounded bg-[#f0fdf4] border border-emerald-200 shadow-sm hover:scale-110 transition-transform m-0.5"></button>
                         </div>
-
-                        <!-- Font Selector -->
                         <select id="fontSelect" onchange="changeFont(this.value)" class="bg-slate-100 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg px-2 py-1.5 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-amber-500 dark:text-white hidden md:block">
                             <option value="font-handwriting">Escrita Cursiva</option>
                             <option value="font-indie">Indie Flower</option>
                             <option value="font-sans">Fonte Padrão (Inter)</option>
                         </select>
-
-                        <!-- Actions -->
                         <button onclick="exportToTXT()" title="Exportar Todo o Caderno (TXT)" class="bg-slate-200 dark:bg-slate-600 hover:bg-slate-300 dark:hover:bg-slate-500 px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-all dark:text-white">
                             <i class="fa-solid fa-file-arrow-down"></i> <span class="hidden xl:inline">TXT</span>
                         </button>
-
                         <button onclick="exportCurrentPagePDF()" title="Exportar Página Atual (PDF)" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5 shadow-sm transition-all">
                             <i class="fa-solid fa-file-pdf"></i> <span class="hidden xl:inline">PDF</span>
                         </button>
-                        
                         <button class="save-data-btn bg-green-600 text-white px-3 py-1.5 rounded-lg font-medium text-xs hover:bg-green-700 transition-colors shadow-sm flex items-center">
                             <i class="fa-solid fa-cloud-arrow-up"></i> <span class="hidden xl:inline ml-1.5">Salvar Nuvem</span>
                         </button>
-
-                        <!-- Dark/Light Toggle -->
                         <button onclick="toggleDarkMode()" class="w-8 h-8 rounded-lg bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-slate-700 dark:text-slate-200 hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors">
                             <i class="fa-solid fa-moon dark:hidden"></i>
                             <i class="fa-solid fa-sun hidden dark:inline"></i>
@@ -262,72 +454,37 @@
                     </div>
                 </div>
 
-                <!-- Notebook Sheet Content -->
                 <div class="flex-1 overflow-y-auto bg-gray-50 dark:bg-slate-900 border-x border-slate-200 dark:border-slate-700 flex justify-center items-start custom-scrollbar">
                     <div id="notebook-sheet" class="w-full max-w-4xl shadow-xl mt-4 mb-8 rounded border border-amber-900/10 dark:border-slate-700 relative transition-colors duration-300 bg-[#fbf0d9] dark:bg-slate-800 flex flex-col min-h-[75vh]">
-                        
-                        <!-- Spiral Binding -->
                         <div class="absolute left-2 sm:left-6 top-0 bottom-0 w-8 hidden md:flex flex-col justify-around items-center py-6 z-10 pointer-events-none opacity-80">
-                            <div class="w-6 h-4 bg-slate-400 dark:bg-slate-600 rounded-full shadow-inner border border-slate-500"></div>
-                            <div class="w-6 h-4 bg-slate-400 dark:bg-slate-600 rounded-full shadow-inner border border-slate-500"></div>
-                            <div class="w-6 h-4 bg-slate-400 dark:bg-slate-600 rounded-full shadow-inner border border-slate-500"></div>
-                            <div class="w-6 h-4 bg-slate-400 dark:bg-slate-600 rounded-full shadow-inner border border-slate-500"></div>
-                            <div class="w-6 h-4 bg-slate-400 dark:bg-slate-600 rounded-full shadow-inner border border-slate-500"></div>
-                            <div class="w-6 h-4 bg-slate-400 dark:bg-slate-600 rounded-full shadow-inner border border-slate-500"></div>
-                            <div class="w-6 h-4 bg-slate-400 dark:bg-slate-600 rounded-full shadow-inner border border-slate-500"></div>
-                            <div class="w-6 h-4 bg-slate-400 dark:bg-slate-600 rounded-full shadow-inner border border-slate-500"></div>
-                            <div class="w-6 h-4 bg-slate-400 dark:bg-slate-600 rounded-full shadow-inner border border-slate-500"></div>
-                            <div class="w-6 h-4 bg-slate-400 dark:bg-slate-600 rounded-full shadow-inner border border-slate-500"></div>
-                            <div class="w-6 h-4 bg-slate-400 dark:bg-slate-600 rounded-full shadow-inner border border-slate-500"></div>
-                            <div class="w-6 h-4 bg-slate-400 dark:bg-slate-600 rounded-full shadow-inner border border-slate-500"></div>
+                            <!-- spirals -->
+                            <div class="w-6 h-4 bg-slate-400 dark:bg-slate-600 rounded-full shadow-inner border border-slate-500"></div><div class="w-6 h-4 bg-slate-400 dark:bg-slate-600 rounded-full shadow-inner border border-slate-500"></div><div class="w-6 h-4 bg-slate-400 dark:bg-slate-600 rounded-full shadow-inner border border-slate-500"></div><div class="w-6 h-4 bg-slate-400 dark:bg-slate-600 rounded-full shadow-inner border border-slate-500"></div><div class="w-6 h-4 bg-slate-400 dark:bg-slate-600 rounded-full shadow-inner border border-slate-500"></div><div class="w-6 h-4 bg-slate-400 dark:bg-slate-600 rounded-full shadow-inner border border-slate-500"></div><div class="w-6 h-4 bg-slate-400 dark:bg-slate-600 rounded-full shadow-inner border border-slate-500"></div><div class="w-6 h-4 bg-slate-400 dark:bg-slate-600 rounded-full shadow-inner border border-slate-500"></div><div class="w-6 h-4 bg-slate-400 dark:bg-slate-600 rounded-full shadow-inner border border-slate-500"></div><div class="w-6 h-4 bg-slate-400 dark:bg-slate-600 rounded-full shadow-inner border border-slate-500"></div><div class="w-6 h-4 bg-slate-400 dark:bg-slate-600 rounded-full shadow-inner border border-slate-500"></div><div class="w-6 h-4 bg-slate-400 dark:bg-slate-600 rounded-full shadow-inner border border-slate-500"></div>
                         </div>
-
-                        <!-- Page Header -->
                         <div class="pt-8 pb-4 px-4 sm:px-6 md:pl-20 border-b-2 border-red-400/40 dark:border-red-500/30 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-transparent shrink-0">
                             <input type="text" id="pageTitle" placeholder="Assunto desta página..." class="w-full sm:w-2/3 bg-transparent text-2xl sm:text-3xl font-bold font-handwriting outline-none border-b border-dashed border-slate-400/50 pb-1 placeholder:text-slate-400/70 dark:placeholder:text-slate-500 dark:text-white" onchange="syncNotebookDOM()">
-                            
                             <div class="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400 bg-white/50 dark:bg-slate-900/50 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm">
                                 <i class="fa-regular fa-calendar-days text-amber-600"></i>
                                 <input type="date" id="pageGlobalDate" class="bg-transparent border-none outline-none font-medium text-xs cursor-pointer dark:text-white" onchange="updateGlobalDate()">
                             </div>
                         </div>
-
-                        <!-- Lined Area -->
                         <div class="relative flex-1 flex flex-col">
                             <div class="absolute left-12 sm:left-16 top-0 bottom-0 w-[2px] bg-red-400/50 dark:bg-red-500/40 hidden sm:block pointer-events-none z-0"></div>
-
-                            <div id="linesContainer" class="notebook-page flex-1 w-full pt-2 px-2 sm:px-4 md:pl-20 pr-4 sm:pr-6 font-handwriting text-lg sm:text-xl z-10 page-transition">
-                                <!-- Linhas via JS -->
-                            </div>
-
+                            <div id="linesContainer" class="notebook-page flex-1 w-full pt-2 px-2 sm:px-4 md:pl-20 pr-4 sm:pr-6 font-handwriting text-lg sm:text-xl z-10 page-transition"></div>
                             <div class="px-4 sm:px-6 md:px-20 py-6 flex justify-start items-center">
                                 <button onclick="addNewLine()" class="bg-amber-600 hover:bg-amber-700 active:scale-95 text-white px-4 py-2 rounded-xl text-sm font-sans font-medium flex items-center gap-2 shadow-md transition-all">
                                     <i class="fa-solid fa-plus"></i> Escrever Nova Linha
                                 </button>
                             </div>
                         </div>
-
-                        <!-- Notebook Footer Pagination -->
                         <div class="mt-auto border-t border-slate-200 dark:border-slate-700/50 bg-black/5 dark:bg-white/5 px-4 sm:px-6 md:pl-20 py-3 flex flex-wrap justify-between items-center gap-4 shrink-0 rounded-b">
                             <div class="flex items-center gap-2 bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700 p-1">
-                                <button onclick="prevPage()" id="btnPrevPage" class="w-8 h-8 flex items-center justify-center rounded bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-amber-100 hover:text-amber-700 dark:hover:bg-amber-900/30 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
-                                    <i class="fa-solid fa-chevron-left"></i>
-                                </button>
-                                <div class="px-3 font-sans text-sm font-medium text-slate-700 dark:text-slate-300 min-w-[100px] text-center" id="pageIndicator">
-                                    Página 1 de 1
-                                </div>
-                                <button onclick="nextPage()" id="btnNextPage" class="w-8 h-8 flex items-center justify-center rounded bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-amber-100 hover:text-amber-700 dark:hover:bg-amber-900/30 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
-                                    <i class="fa-solid fa-chevron-right"></i>
-                                </button>
+                                <button onclick="prevPage()" id="btnPrevPage" class="w-8 h-8 flex items-center justify-center rounded bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-amber-100 hover:text-amber-700 dark:hover:bg-amber-900/30 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"><i class="fa-solid fa-chevron-left"></i></button>
+                                <div class="px-3 font-sans text-sm font-medium text-slate-700 dark:text-slate-300 min-w-[100px] text-center" id="pageIndicator">Página 1 de 1</div>
+                                <button onclick="nextPage()" id="btnNextPage" class="w-8 h-8 flex items-center justify-center rounded bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-amber-100 hover:text-amber-700 dark:hover:bg-amber-900/30 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"><i class="fa-solid fa-chevron-right"></i></button>
                             </div>
-
                             <div class="flex items-center gap-2">
-                                <button onclick="deleteCurrentPage()" title="Excluir Página Atual" class="text-xs text-red-500 hover:text-red-700 bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/40 px-3 py-2 rounded-lg font-sans font-medium transition-colors flex items-center gap-1.5">
-                                    <i class="fa-solid fa-trash-can"></i> <span class="hidden sm:inline">Excluir Pág.</span>
-                                </button>
-                                <button onclick="addNewPage()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-sm font-sans font-medium flex items-center gap-2 shadow-sm transition-all active:scale-95">
-                                    <i class="fa-solid fa-file-circle-plus"></i> Nova Página
-                                </button>
+                                <button onclick="deleteCurrentPage()" title="Excluir Página Atual" class="text-xs text-red-500 hover:text-red-700 bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/40 px-3 py-2 rounded-lg font-sans font-medium transition-colors flex items-center gap-1.5"><i class="fa-solid fa-trash-can"></i> <span class="hidden sm:inline">Excluir Pág.</span></button>
+                                <button onclick="addNewPage()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-sm font-sans font-medium flex items-center gap-2 shadow-sm transition-all active:scale-95"><i class="fa-solid fa-file-circle-plus"></i> Nova Página</button>
                             </div>
                         </div>
                     </div>
@@ -466,7 +623,6 @@
         window.cloudReady = true;
 
         window.saveDataToCloud = async function() {
-            // Sincroniza qualquer estado do DOM do caderno antes de subir para a nuvem
             if (window.syncNotebookDOM) window.syncNotebookDOM();
 
             const payload = {
@@ -513,7 +669,281 @@
 
     <!-- Main Logic -->
     <script>
-        // UI / Sidebar Logic
+        // ----------------------------------------------------
+        // LÓGICA DO DIÁRIO DE OBSERVAÇÕES (Anotações)
+        // ----------------------------------------------------
+        const obsForm = document.getElementById('obsForm');
+        const listaDiv = document.getElementById('listaObservacoes');
+        const filtroTurmaObs = document.getElementById('filtroTurmaObs');
+        const buscaAlunoObs = document.getElementById('buscaAlunoObs');
+
+        function formatarData(dataIso) {
+            const data = new Date(dataIso);
+            return data.toLocaleString('pt-PT', { 
+                day: '2-digit', month: '2-digit', year: 'numeric',
+                hour: '2-digit', minute: '2-digit'
+            });
+        }
+
+        function getCorCategoria(categoria) {
+            switch(categoria) {
+                case 'Participação': return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300';
+                case 'Comportamento': return 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300';
+                case 'Dificuldade (Conteúdo)': return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300';
+                case 'Elogio': return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300';
+                default: return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
+            }
+        }
+
+        function carregarObservacoes() {
+            if (window.observacoesGlobal) {
+                window.observacoesGlobal.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+            }
+            renderizarObservacoes();
+        }
+
+        function obterObservacoesFiltradas() {
+            if (!window.observacoesGlobal) return [];
+            
+            const filtroT = filtroTurmaObs.value;
+            const termoBusca = buscaAlunoObs.value.toLowerCase().trim();
+
+            return window.observacoesGlobal.filter(obs => {
+                const matchTurma = filtroT === 'Todas' || obs.turma === filtroT;
+                const matchNome = obs.aluno.toLowerCase().includes(termoBusca);
+                return matchTurma && matchNome;
+            });
+        }
+
+        function agruparPorAluno(obsList) {
+            return obsList.reduce((acc, obs) => {
+                if (!acc[obs.aluno]) acc[obs.aluno] = [];
+                acc[obs.aluno].push(obs);
+                return acc;
+            }, {});
+        }
+
+        function renderizarObservacoes() {
+            listaDiv.innerHTML = '';
+            const obsFiltradas = obterObservacoesFiltradas();
+
+            if (obsFiltradas.length === 0) {
+                listaDiv.innerHTML = '<p class="text-gray-500 dark:text-gray-400 text-center italic mt-10">Nenhuma observação encontrada.</p>';
+                return;
+            }
+
+            const agrupadas = agruparPorAluno(obsFiltradas);
+
+            for (const [nomeAluno, listaObs] of Object.entries(agrupadas)) {
+                const turmaDoAluno = listaObs[0].turma;
+
+                const cardAluno = document.createElement('div');
+                cardAluno.className = 'border dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 overflow-hidden shadow-sm';
+
+                let htmlCard = `
+                    <div class="bg-gray-100 dark:bg-slate-700 px-4 py-2 border-b dark:border-slate-600 flex justify-between items-center">
+                        <span class="font-bold text-gray-800 dark:text-gray-200">${nomeAluno}</span>
+                        <span class="text-sm text-gray-600 dark:text-gray-400">(${turmaDoAluno})</span>
+                    </div>
+                    <div class="p-4 space-y-4">
+                `;
+
+                listaObs.forEach((obs) => {
+                    htmlCard += `
+                        <div class="relative pl-4 border-l-2 border-gray-200 dark:border-slate-600">
+                            <div class="flex justify-between items-start mb-1">
+                                <span class="text-xs font-semibold px-2 py-1 rounded-full ${getCorCategoria(obs.categoria)}">
+                                    ${obs.categoria}
+                                </span>
+                                <span class="text-xs text-gray-400 dark:text-gray-500">${formatarData(obs.created_at)}</span>
+                            </div>
+                            <p class="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap">${obs.texto}</p>
+                            <button onclick="deletarObservacao('${obs.id}')" class="absolute bottom-0 right-0 text-xs text-red-500 hover:text-red-700">Excluir</button>
+                        </div>
+                    `;
+                });
+
+                htmlCard += `</div>`;
+                cardAluno.innerHTML = htmlCard;
+                listaDiv.appendChild(cardAluno);
+            }
+        }
+
+        obsForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const novaObs = {
+                id: Date.now().toString(),
+                created_at: new Date().toISOString(),
+                turma: document.getElementById('turma').value,
+                aluno: document.getElementById('aluno').value.trim(),
+                categoria: document.getElementById('categoria').value,
+                texto: document.getElementById('textoObs').value.trim()
+            };
+
+            window.observacoesGlobal.push(novaObs);
+            
+            // Limpa o form
+            document.getElementById('aluno').value = '';
+            document.getElementById('textoObs').value = '';
+            document.getElementById('aluno').focus();
+
+            carregarObservacoes();
+            
+            // Salva na nuvem e atualiza a UI localmente
+            window.saveAllData(); 
+        });
+
+        window.deletarObservacao = function(id) {
+            if(confirm('Tem a certeza que deseja excluir este registo?')) {
+                window.observacoesGlobal = window.observacoesGlobal.filter(obs => obs.id !== id);
+                carregarObservacoes();
+                window.saveAllData(); // Sincroniza exclusão
+            }
+        }
+
+        window.gerarPDFObservacoes = function() {
+            const obsFiltradas = obterObservacoesFiltradas();
+            
+            if (obsFiltradas.length === 0) {
+                alert('Não há observações filtradas para exportar.');
+                return;
+            }
+
+            const agrupadas = agruparPorAluno(obsFiltradas);
+            const elementoRelatorio = document.createElement('div');
+            
+            let htmlPDF = `
+                <div style="padding: 2.5cm; font-family: 'Computer Modern Serif', 'Times New Roman', serif; color: black; line-height: 1.5; font-size: 12pt; background: white;">
+                    <div style="font-size: 18pt; font-weight: bold; text-align: center; margin-bottom: 0.8cm;">
+                        Relatório de Observações — ${filtroTurmaObs.value === 'Todas' ? 'Todas as Turmas' : filtroTurmaObs.value}
+                    </div>
+                    <div style="border-top: 1pt solid black; margin-bottom: 1.2cm;"></div>
+            `;
+
+            for (const [nomeAluno, listaObs] of Object.entries(agrupadas)) {
+                htmlPDF += `
+                    <div style="margin-bottom: 1cm; page-break-inside: avoid;">
+                        <div style="font-weight: bold; font-size: 14pt; margin-bottom: 0.3cm; border-bottom: 1px solid #ddd; padding-bottom: 0.1cm;">
+                            Aluno(a): ${nomeAluno} (${listaObs[0].turma})
+                        </div>
+                `;
+                
+                listaObs.forEach(obs => {
+                    htmlPDF += `
+                        <div style="margin-bottom: 0.5cm; text-align: justify; padding-left: 0.5cm;">
+                            <div style="font-style: italic; margin-bottom: 0.1cm;">
+                                <span style="float: right; font-weight: normal; font-size: 11pt;">${formatarData(obs.created_at)}</span>
+                                Categoria: ${obs.categoria}
+                            </div>
+                            <div>${obs.texto}</div>
+                        </div>
+                    `;
+                });
+                
+                htmlPDF += `</div>`;
+            }
+
+            htmlPDF += `</div>`;
+            elementoRelatorio.innerHTML = htmlPDF;
+
+            const opt = {
+                margin:       0,
+                filename:     `Relatorio_Observacoes_${new Date().getTime()}.pdf`,
+                image:        { type: 'jpeg', quality: 1 },
+                html2canvas:  { scale: 2 },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            html2pdf().set(opt).from(elementoRelatorio).save();
+        }
+
+        filtroTurmaObs.addEventListener('change', renderizarObservacoes);
+        buscaAlunoObs.addEventListener('input', renderizarObservacoes);
+
+
+        // ----------------------------------------------------
+        // LÓGICA DA CALCULADORA DE NOTAS
+        // ----------------------------------------------------
+        const gradeDisplay = document.getElementById('gradeDisplay');
+        const percentInput = document.getElementById('percentInput');
+        const percentSlider = document.getElementById('percentSlider');
+        const hitsInput = document.getElementById('hitsInput');
+        const hitsSlider = document.getElementById('hitsSlider');
+        const calcTableBody = document.getElementById('calcTableBody');
+
+        function syncCalcValues(source, value) {
+            let percent, hits, grade;
+
+            if (source === 'percent') {
+                percent = parseFloat(value) || 0;
+                if (percent > 100) percent = 100;
+                if (percent < 0) percent = 0;
+                hits = (percent / 100) * 22;
+            } else if (source === 'hits') {
+                hits = parseFloat(value) || 0;
+                if (hits > 22) hits = 22;
+                if (hits < 0) hits = 0;
+                percent = (hits / 22) * 100;
+            }
+
+            grade = percent / 10;
+
+            const formatPtBR = (num, minFraction, maxFraction) => {
+                return num.toLocaleString('pt-BR', {
+                    minimumFractionDigits: minFraction, 
+                    maximumFractionDigits: maxFraction
+                });
+            };
+
+            gradeDisplay.innerText = formatPtBR(grade, 2, 2);
+
+            if (source !== 'percent') {
+                percentSlider.value = percent;
+                percentInput.value = percent.toFixed(1);
+            }
+            if (source !== 'hits') {
+                hitsSlider.value = hits;
+                hitsInput.value = (hits % 1 === 0) ? hits : hits.toFixed(1); 
+            }
+        }
+
+        percentInput.addEventListener('input', (e) => syncCalcValues('percent', e.target.value));
+        percentSlider.addEventListener('input', (e) => syncCalcValues('percent', e.target.value));
+        hitsInput.addEventListener('input', (e) => syncCalcValues('hits', e.target.value));
+        hitsSlider.addEventListener('input', (e) => syncCalcValues('hits', e.target.value));
+
+        function generateCalcReferenceTable() {
+            let htmlContent = '';
+            const formatPtBR = (num, minFraction, maxFraction) => {
+                return num.toLocaleString('pt-BR', {
+                    minimumFractionDigits: minFraction, 
+                    maximumFractionDigits: maxFraction
+                });
+            };
+
+            for (let i = 1; i <= 22; i++) {
+                const percent = (i / 22) * 100;
+                const grade = percent / 10;
+                
+                htmlContent += `
+                    <tr class="hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors duration-150">
+                        <td class="px-6 py-2 whitespace-nowrap text-left font-semibold text-gray-700 dark:text-gray-300">${i}</td>
+                        <td class="px-6 py-2 whitespace-nowrap text-center text-gray-600 dark:text-gray-400">${formatPtBR(percent, 1, 2)}%</td>
+                        <td class="px-6 py-2 whitespace-nowrap text-right font-bold text-blue-600 dark:text-blue-400">${formatPtBR(grade, 2, 2)}</td>
+                    </tr>
+                `;
+            }
+            calcTableBody.innerHTML = htmlContent;
+        }
+        
+        syncCalcValues('hits', 11); 
+        generateCalcReferenceTable();
+
+
+        // ----------------------------------------------------
+        // UI / SIDEBAR LOGIC E DADOS GLOBAIS
+        // ----------------------------------------------------
         const sidebar = document.getElementById('sidebar');
         const toggleBtn = document.getElementById('toggleBtn');
         const overlay = document.getElementById('sidebarOverlay');
@@ -545,8 +975,10 @@
         handleResize();
 
         // ----------------------------------------------------
-        // GESTÃO DE DADOS GLOBAIS (Turmas)
+        // GESTÃO DE DADOS GLOBAIS
         // ----------------------------------------------------
+        window.observacoesGlobal = []; // Array global para as observações
+
         window.TURMAS = [
             { id: '5', label: '5º Ano A' },
             { id: '6', label: '6º Ano A' },
@@ -566,14 +998,12 @@
             "GABRIELA FERNANDES RIBEIRO"
         ];
         
-        // Estrutura Padrão Inicial
         window.turmaData = {};
         window.TURMAS.forEach(t => {
             window.turmaData[t.id] = {
                 students: t.id === '5' ? ALUNOS_INICIAIS_5.slice() : [],
                 studentGrades: {},
                 attendanceState: {},
-                // Novo objeto para o Caderno (isolado por turma)
                 notebookData: {
                     notebookTitle: 'Caderno de Conteúdo',
                     theme: 'classic',
@@ -593,12 +1023,13 @@
             window.students = d.students;
             window.studentGrades = d.studentGrades;
             window.attendanceState = d.attendanceState;
-            window.notebookPageIndex = 0; // Reseta para a pág 1 ao trocar de turma
+            window.notebookPageIndex = 0; 
         };
         window.bindTurma('5');
 
         window.getAllData = function() {
-            return { version: 3, turmas: window.turmaData };
+            // Inclui as observações junto com as turmas
+            return { version: 4, turmas: window.turmaData, observacoes: window.observacoesGlobal };
         };
 
         window.applyLoadedData = function(d) {
@@ -621,16 +1052,32 @@
                     }
                 });
             }
+            
+            if (d.observacoes) {
+                window.observacoesGlobal = d.observacoes;
+            }
+
             window.bindTurma(window.currentTurma);
+            carregarObservacoes();
         };
 
         window.cloudReady = false; 
         window.STORAGE_KEY = 'sistemaPereiraData';
 
-        // Backup Local
         try {
             const saved = localStorage.getItem(window.STORAGE_KEY);
             if (saved) { window.applyLoadedData(JSON.parse(saved)); }
+
+            // Migração: Salva observações antigas se ainda estiverem soltas
+            const oldObs = localStorage.getItem('diario_observacoes');
+            if(oldObs) {
+                const parsedOld = JSON.parse(oldObs);
+                if(parsedOld && parsedOld.length > 0) {
+                    window.observacoesGlobal = [...window.observacoesGlobal, ...parsedOld];
+                    localStorage.removeItem('diario_observacoes');
+                    window.saveLocalBackup();
+                }
+            }
         } catch (e) { console.warn("Erro ao ler backup local:", e); }
 
         window.saveLocalBackup = function() {
@@ -638,7 +1085,6 @@
             catch (e) { console.error("Erro ao salvar localmente:", e); }
         }
 
-        // Toasts / Avisos
         window.showToast = function(message, type) {
             let box = document.getElementById('toast-box');
             if (!box) {
@@ -715,7 +1161,6 @@
         // ----------------------------------------------------
         // LÓGICA DO CADERNO (Listar Conteúdo)
         // ----------------------------------------------------
-        
         function getActiveNotebook() {
             return window.turmaData[window.currentTurma].notebookData;
         }
@@ -739,13 +1184,12 @@
                     page.lines.push({ date: dateInput.value, text: textInput.value });
                 }
             });
-            window.saveLocalBackup(); // Auto-save local apenas
+            window.saveLocalBackup();
         }
 
         window.renderNotebookPage = function() {
             const data = getActiveNotebook();
             
-            // Se a turma estiver sem páginas, cria uma inicial.
             if (!data.pages || data.pages.length === 0) {
                 const today = new Date().toISOString().split('T')[0];
                 data.pages = [{
@@ -762,17 +1206,14 @@
             const page = data.pages[window.notebookPageIndex];
             const container = document.getElementById('linesContainer');
             
-            // UI Global
             document.getElementById('notebookGlobalTitle').value = data.notebookTitle || '';
             document.getElementById('pageTitle').value = page.title || '';
             document.getElementById('pageGlobalDate').value = page.globalDate || new Date().toISOString().split('T')[0];
             
-            // Tema e Fonte
             document.getElementById('fontSelect').value = data.font || 'font-handwriting';
             changeFont(data.font || 'font-handwriting', false);
             setPaperColor(data.theme || 'classic', false);
 
-            // Animação CSS
             container.classList.remove('page-transition');
             void container.offsetWidth; 
             container.classList.add('page-transition');
@@ -1055,11 +1496,10 @@
 
 
         // ----------------------------------------------------
-        // LÓGICA DE FREQUÊNCIA, BOLETIM E ROTAS
+        // LÓGICA DE FREQUÊNCIA E BOLETIM
         // ----------------------------------------------------
         
         window.generateTable = function(monthStr) {
-            // (Lógica da Tabela de Frequência - Mantida intacta do último código)
             const [year, month] = monthStr.split('-');
             const daysInMonth = new Date(year, month, 0).getDate();
             if (!window.attendanceState[monthStr]) window.attendanceState[monthStr] = {};
@@ -1182,7 +1622,6 @@
         }
 
         window.generateBoletimTable = function() {
-            // (Lógica do Boletim - Mantida intacta do último código)
             const turmaSelect = document.getElementById('boletim-turma-select');
             const is5thGrade = turmaSelect ? turmaSelect.value === '5' : true;
             const bimestreSelect = document.getElementById('boletim-bimestre-select');
@@ -1316,7 +1755,6 @@
             }
         }
 
-        // ATUALIZAÇÃO GERAL AO TROCAR DE TURMA
         window.refreshAll = function() {
             ['frequencia-turma-select', 'boletim-turma-select', 'caderno-turma-select'].forEach(id => {
                 const el = document.getElementById(id);
@@ -1327,19 +1765,16 @@
             if (m) window.generateTable(m.value);
             window.generateBoletimTable();
             window.updatePrintHeader();
-            
-            // Renderiza o caderno da turma correta
             window.renderNotebookPage();
         };
 
         window.setTurma = function(id) {
-            if(window.syncNotebookDOM) window.syncNotebookDOM(); // Salva estado atual antes de trocar
+            if(window.syncNotebookDOM) window.syncNotebookDOM();
             window.bindTurma(id);
             try { localStorage.setItem('sistemaPereiraTurma', window.currentTurma); } catch (e) {}
             window.refreshAll();
         };
 
-        // Listeners de Turma
         ['frequencia-turma-select', 'boletim-turma-select', 'caderno-turma-select'].forEach(id => {
             const el = document.getElementById(id);
             if (el) el.addEventListener('change', (e) => window.setTurma(e.target.value));
@@ -1352,7 +1787,6 @@
             });
         }
 
-        // Carrega estado inicial
         try {
             const lastTurma = localStorage.getItem('sistemaPereiraTurma');
             if (lastTurma && window.turmaData[lastTurma]) window.bindTurma(lastTurma);
@@ -1381,7 +1815,7 @@
         }
 
         window.showView = function(viewName) {
-            ['default-view', 'frequencia-view', 'boletim-view', 'registro-view', 'caderno-view'].forEach(id => {
+            ['default-view', 'frequencia-view', 'boletim-view', 'registro-view', 'caderno-view', 'calculadora-view', 'anotacoes-view'].forEach(id => {
                 document.getElementById(id).classList.add('hidden');
             });
              
@@ -1395,6 +1829,11 @@
             } else if (viewName === 'caderno') {
                 window.renderNotebookPage();
                 document.getElementById('caderno-view').classList.remove('hidden');
+            } else if (viewName === 'calculadora') {
+                document.getElementById('calculadora-view').classList.remove('hidden');
+            } else if (viewName === 'anotacoes') {
+                carregarObservacoes(); // Atualiza a lista caso venha da nuvem
+                document.getElementById('anotacoes-view').classList.remove('hidden');
             } else {
                 document.getElementById('default-view').classList.remove('hidden');
             }
@@ -1404,7 +1843,6 @@
             }
         }
         
-        // Abre na frequência por padrão
         window.showView('frequencia');
     </script>
 </body>
