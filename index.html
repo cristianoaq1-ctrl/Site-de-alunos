@@ -497,10 +497,10 @@
             window.bindTurma(window.currentTurma);
         };
 
-        window.cloudReady = false; // o módulo do Supabase muda para true quando carrega
+        window.cloudReady = false; 
         window.STORAGE_KEY = 'sistemaPereiraData';
 
-        // Backup local (usado se a nuvem estiver indisponível)
+        // Backup local
         try {
             const saved = localStorage.getItem(window.STORAGE_KEY);
             if (saved) {
@@ -527,7 +527,6 @@
             setTimeout(() => t.remove(), type === 'error' ? 12000 : 4000);
         };
 
-        // Traduz o erro técnico em uma orientação clara
         window.explainCloudError = function(e) {
             if (typeof window.saveDataToCloud !== 'function') {
                 return 'Não foi possível carregar a biblioteca do Supabase. Verifique a conexão com a internet.';
@@ -656,13 +655,36 @@
                               </td>`;
                 
                 validDays.forEach((d) => {
-                    if (window.attendanceState[monthStr][student][d] === undefined) {
-                         window.attendanceState[monthStr][student][d] = false;
+                    let rawState = window.attendanceState[monthStr][student][d];
+                    let state = rawState;
+
+                    // Migração de dados legados: true -> 'P' / false e undefined -> null (em branco)
+                    if (rawState === true) {
+                        state = 'P';
+                        window.attendanceState[monthStr][student][d] = 'P';
+                    } else if (rawState === false || rawState === undefined) {
+                        state = null;
+                        window.attendanceState[monthStr][student][d] = null;
                     }
-                    const isChecked = window.attendanceState[monthStr][student][d] ? 'checked' : '';
+
+                    let icon = '';
+                    let btnClass = 'w-6 h-6 rounded flex items-center justify-center text-xs font-bold transition-colors shadow-sm border ';
+
+                    if (state === 'P') {
+                        icon = '<i class="fa-solid fa-check"></i>';
+                        btnClass += 'bg-green-100 text-green-600 border-green-300 hover:bg-green-200';
+                    } else if (state === 'F') {
+                        icon = '<i class="fa-solid fa-xmark"></i>';
+                        btnClass += 'bg-red-100 text-red-600 border-red-300 hover:bg-red-200';
+                    } else {
+                        icon = '-';
+                        btnClass += 'bg-gray-100 text-gray-400 border-gray-200 hover:bg-gray-200';
+                    }
                     
                     tbodyHtml += `<td class="p-2 border-r border-gray-200 ${rowClass} group-hover:bg-gray-100 transition-colors text-center">
-                                    <input type="checkbox" class="w-4 h-4 accent-[#1e6091] cursor-pointer rounded" ${isChecked} onchange="toggleAttendance('${monthStr}', '${student.replace(/'/g, "\\'")}', ${d}, this.checked)">
+                                    <button onclick="cycleAttendance(this, '${monthStr}', '${student.replace(/'/g, "\\'")}', ${d})" class="mx-auto ${btnClass}" data-state="${state}">
+                                        ${icon}
+                                    </button>
                                   </td>`;
                 });
                 tbodyHtml += `</tr>`;
@@ -673,10 +695,33 @@
             document.getElementById('frequencia-tbody').innerHTML = tbodyHtml;
         }
 
-        window.toggleAttendance = function(monthStr, student, day, isChecked) {
+        window.cycleAttendance = function(btn, monthStr, student, day) {
             if (!window.attendanceState[monthStr]) window.attendanceState[monthStr] = {};
             if (!window.attendanceState[monthStr][student]) window.attendanceState[monthStr][student] = {};
-            window.attendanceState[monthStr][student][day] = isChecked;
+
+            let currentState = window.attendanceState[monthStr][student][day];
+            let newState;
+            
+            // Ciclo: Nulo -> Presença (P) -> Falta (F) -> Nulo
+            if (currentState === null || currentState === undefined) newState = 'P';
+            else if (currentState === 'P') newState = 'F';
+            else newState = null;
+
+            window.attendanceState[monthStr][student][day] = newState;
+
+            // Atualiza a UI do botão
+            btn.dataset.state = newState;
+            if (newState === 'P') {
+                btn.innerHTML = '<i class="fa-solid fa-check"></i>';
+                btn.className = 'mx-auto w-6 h-6 rounded flex items-center justify-center text-xs font-bold transition-colors shadow-sm border bg-green-100 text-green-600 border-green-300 hover:bg-green-200';
+            } else if (newState === 'F') {
+                btn.innerHTML = '<i class="fa-solid fa-xmark"></i>';
+                btn.className = 'mx-auto w-6 h-6 rounded flex items-center justify-center text-xs font-bold transition-colors shadow-sm border bg-red-100 text-red-600 border-red-300 hover:bg-red-200';
+            } else {
+                btn.innerHTML = '-';
+                btn.className = 'mx-auto w-6 h-6 rounded flex items-center justify-center text-xs font-bold transition-colors shadow-sm border bg-gray-100 text-gray-400 border-gray-200 hover:bg-gray-200';
+            }
+
             window.generateBoletimTable();
         }
 
@@ -684,7 +729,7 @@
             window.students.forEach(student => {
                 if (!window.attendanceState[monthStr]) window.attendanceState[monthStr] = {};
                 if (!window.attendanceState[monthStr][student]) window.attendanceState[monthStr][student] = {};
-                window.attendanceState[monthStr][student][day] = true;
+                window.attendanceState[monthStr][student][day] = 'P';
             });
             window.generateTable(monthStr); 
             window.generateBoletimTable(); 
@@ -747,10 +792,9 @@
 
                 let faltas = 0;
                 if (freqRows[index]) {
-                    const checkboxes = freqRows[index].querySelectorAll('input[type="checkbox"]');
-                    checkboxes.forEach(cb => { 
-                        if(!cb.checked) faltas++; 
-                    });
+                    // Contabiliza apenas os botões explicitamente marcados como 'F' (Falta)
+                    const btns = freqRows[index].querySelectorAll('button[data-state="F"]');
+                    faltas = btns.length;
                 }
 
                 const isEven = index % 2 === 0;
