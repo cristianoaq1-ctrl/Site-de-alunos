@@ -3,24 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Menu Lateral - Dashboard Educacional</title>
+    <title>Dashboard Educacional - Sistema Pereira</title>
     
-    <!-- Google Fonts: Inter -->
+    <!-- Google Fonts: Inter + Handwriting Fonts for Notebook -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Indie+Flower&family=Patrick+Hand&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     
     <!-- FontAwesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <!-- html2pdf for exporting PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
+            darkMode: 'class',
             theme: {
                 extend: {
                     fontFamily: {
                         sans: ['Inter', 'sans-serif'],
+                        handwriting: ['"Patrick Hand"', '"Caveat"', 'cursive'],
+                        indie: ['"Indie Flower"', 'cursive'],
                     },
                     colors: {
                         brand: {
@@ -39,19 +45,40 @@
     </script>
 
     <style>
-        .sidebar-scroll::-webkit-scrollbar {
-            width: 6px;
+        /* Sidebar Custom Scrollbar */
+        .sidebar-scroll::-webkit-scrollbar { width: 6px; }
+        .sidebar-scroll::-webkit-scrollbar-track { background: transparent; }
+        .sidebar-scroll::-webkit-scrollbar-thumb { background-color: #d1d5db; border-radius: 10px; }
+        
+        .custom-scrollbar::-webkit-scrollbar { width: 8px; height: 8px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: rgba(0,0,0,0.05); border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.2); border-radius: 4px; }
+        
+        /* Custom styles for realistic notebook lines */
+        .notebook-page {
+            background-image: linear-gradient(to bottom, transparent 31px, rgba(59, 130, 246, 0.25) 31px, rgba(59, 130, 246, 0.25) 32px);
+            background-size: 100% 32px;
+            line-height: 32px;
         }
-        .sidebar-scroll::-webkit-scrollbar-track {
-            background: transparent;
+        .dark .notebook-page {
+            background-image: linear-gradient(to bottom, transparent 31px, rgba(147, 197, 253, 0.15) 31px, rgba(147, 197, 253, 0.15) 32px);
         }
-        .sidebar-scroll::-webkit-scrollbar-thumb {
-            background-color: #d1d5db;
-            border-radius: 10px;
+        .notebook-line {
+            height: 32px;
+            min-height: 32px;
+        }
+        
+        /* Smooth transitions for pagination */
+        .page-transition {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
-<body class="bg-gray-100 flex h-screen antialiased text-brand-text overflow-hidden print:bg-white print:overflow-visible print:h-auto">
+<body class="bg-gray-100 flex h-screen antialiased text-brand-text overflow-hidden print:bg-white print:overflow-visible print:h-auto transition-colors duration-300">
 
     <!-- Sidebar -->
     <aside id="sidebar" class="w-80 h-full bg-brand-bg border-r border-brand-border flex flex-col shadow-[4px_0_24px_rgba(0,0,0,0.02)] absolute md:relative z-30 transition-all duration-300 ease-in-out flex-shrink-0 print:hidden">
@@ -73,9 +100,9 @@
                     <span>Dashboard</span>
                 </div>
                 <div class="flex flex-col space-y-2.5">
-                    <a href="#" class="flex items-center space-x-4 w-full px-5 py-3 rounded-[24px] border border-brand-border bg-transparent text-[15px] font-medium hover:bg-white transition-all shadow-sm">
-                        <i class="fa-solid fa-building text-gray-500 w-5 text-center text-lg"></i>
-                        <span>Painel Municipal</span>
+                    <a href="#" onclick="showView('caderno'); return false;" class="flex items-center space-x-4 w-full px-5 py-3 rounded-[24px] border border-brand-border bg-transparent text-[15px] font-medium hover:bg-white transition-all shadow-sm">
+                        <i class="fa-solid fa-book-open text-amber-600 w-5 text-center text-lg"></i>
+                        <span>Listar Conteúdo</span>
                     </a>
                 </div>
             </div>
@@ -140,49 +167,20 @@
                         <i class="fa-solid fa-user-graduate text-gray-500 w-5 text-center text-lg"></i>
                         <span>Alunos</span>
                     </a>
-                    <a href="#" class="flex items-center space-x-4 w-full px-5 py-3 rounded-[24px] border border-brand-border bg-transparent text-[15px] font-medium hover:bg-white transition-all">
-                        <i class="fa-regular fa-address-card text-gray-500 w-5 text-center text-lg"></i>
-                        <span>Servidores</span>
-                    </a>
-                    <a href="#" class="flex items-center space-x-4 w-full px-5 py-3 rounded-[24px] border border-brand-border bg-transparent text-[15px] font-medium hover:bg-white transition-all">
-                        <i class="fa-regular fa-calendar-days text-gray-500 w-5 text-center text-lg"></i>
-                        <span>Quadro de Horários</span>
-                    </a>
-                    <a href="#" class="flex items-center space-x-4 w-full px-5 py-3 rounded-[24px] border border-brand-border bg-transparent text-[15px] font-medium hover:bg-white transition-all">
-                        <i class="fa-solid fa-user-gear text-gray-500 w-5 text-center text-lg"></i>
-                        <span>Gestão de Matrículas</span>
-                    </a>
-                </div>
-            </div>
-
-            <div class="mb-4">
-                <div class="flex items-center space-x-3 text-brand-purple text-xs font-bold uppercase tracking-wide mb-4">
-                    <i class="fa-regular fa-calendar text-base w-5 text-center"></i>
-                    <span>Calendário</span>
-                </div>
-                <div class="flex flex-col space-y-2.5">
-                    <a href="#" class="flex items-center space-x-4 w-full px-5 py-3 rounded-[24px] border border-brand-border bg-transparent text-[15px] font-medium hover:bg-white transition-all">
-                        <i class="fa-regular fa-calendar-check text-gray-500 w-5 text-center text-lg"></i>
-                        <span>Calendário Escolar</span>
-                    </a>
-                    <a href="#" class="flex items-center space-x-4 w-full px-5 py-3 rounded-[24px] border border-brand-border bg-transparent text-[15px] font-medium hover:bg-white transition-all">
-                        <i class="fa-solid fa-calendar-day text-gray-500 w-5 text-center text-lg"></i>
-                        <span>Feriados Municipais</span>
-                    </a>
                 </div>
             </div>
         </div>
     </aside>
 
     <!-- Main Workspace Area -->
-    <div class="flex-1 flex flex-col min-w-0 h-full relative print:block print:w-full print:h-auto print:overflow-visible">
+    <div class="flex-1 flex flex-col min-w-0 h-full relative print:block print:w-full print:h-auto print:overflow-visible dark:bg-slate-900">
         
-        <header class="h-20 bg-brand-headerBg border-b border-brand-border px-6 flex items-center justify-between shrink-0 z-20 print:hidden">
+        <header class="h-20 bg-brand-headerBg dark:bg-slate-800 border-b border-brand-border dark:border-slate-700 px-6 flex items-center justify-between shrink-0 z-20 print:hidden transition-colors">
             <div class="flex items-center space-x-5">
-                <button id="toggleBtn" class="w-12 h-12 rounded-full bg-brand-btnBg flex items-center justify-center text-brand-dark hover:bg-opacity-80 transition-colors shadow-sm outline-none">
+                <button id="toggleBtn" class="w-12 h-12 rounded-full bg-brand-btnBg dark:bg-slate-700 flex items-center justify-center text-brand-dark dark:text-white hover:bg-opacity-80 transition-colors shadow-sm outline-none">
                     <i class="fa-solid fa-bars text-xl"></i>
                 </button>
-                <h2 class="text-xl font-bold text-brand-dark hidden sm:block">Sistema Pereira</h2>
+                <h2 class="text-xl font-bold text-brand-dark dark:text-white hidden sm:block">Sistema Pereira</h2>
             </div>
             
             <div class="w-12 h-12 rounded-full bg-brand-dark flex items-center justify-center text-white shadow-md cursor-pointer hover:bg-opacity-90 transition-opacity">
@@ -190,13 +188,149 @@
             </div>
         </header>
 
-        <main class="flex-1 bg-white flex flex-col p-6 overflow-hidden relative print:block print:overflow-visible print:p-0">
+        <main class="flex-1 bg-white dark:bg-slate-900 flex flex-col p-4 sm:p-6 overflow-hidden relative print:block print:overflow-visible print:p-0 transition-colors">
             
             <div id="default-view" class="flex-1 flex flex-col items-center justify-center hidden print:hidden">
                 <div class="text-center text-gray-400">
                     <i class="fa-solid fa-hand-pointer text-4xl mb-4 opacity-50"></i>
-                    <h1 class="text-xl font-medium text-gray-500">Selecione um item no menu</h1>
+                    <h1 class="text-xl font-medium text-gray-500 dark:text-gray-300">Selecione um item no menu</h1>
                     <p class="text-sm mt-2">Navegue pelas opções laterais para visualizar o conteúdo.</p>
+                </div>
+            </div>
+
+            <!-- Caderno / Listar Conteúdo View -->
+            <div id="caderno-view" class="flex-1 flex flex-col h-full hidden print:block">
+                
+                <!-- Caderno Toolbar -->
+                <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-t-lg px-4 py-3 shadow-sm flex flex-wrap justify-between items-center gap-4 shrink-0">
+                    
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 rounded-xl bg-amber-600 flex items-center justify-center text-white shadow-md">
+                            <i class="fa-solid fa-book-open text-xl"></i>
+                        </div>
+                        <div class="flex flex-col">
+                            <input type="text" id="notebookGlobalTitle" placeholder="Título do Caderno" class="font-bold text-lg leading-tight bg-transparent border-none outline-none focus:ring-2 focus:ring-amber-500 rounded px-1 -ml-1 placeholder:text-slate-400 dark:text-white" onchange="syncNotebookDOM()">
+                            <div class="flex items-center space-x-2 mt-1">
+                                <label class="font-bold text-xs text-gray-600 dark:text-gray-300">Turma:</label>
+                                <select id="caderno-turma-select" class="border border-gray-300 dark:border-slate-600 rounded px-1 py-0.5 text-xs outline-none bg-white dark:bg-slate-700 dark:text-white">
+                                    <option value="5">5º Ano A</option>
+                                    <option value="6">6º Ano A</option>
+                                    <option value="7">7º Ano A</option>
+                                    <option value="8">8º Ano A</option>
+                                    <option value="9">9º Ano A</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Controls Toolbar -->
+                    <div class="flex flex-wrap items-center gap-2">
+                        <!-- Paper Theme Selector -->
+                        <div class="flex items-center bg-slate-100 dark:bg-slate-700 p-1 rounded-lg border border-slate-200 dark:border-slate-600 text-xs">
+                            <span class="px-2 text-slate-500 dark:text-slate-300 font-medium hidden lg:inline">Papel:</span>
+                            <button onclick="setPaperColor('classic')" title="Amarelado Antigo" class="w-6 h-6 rounded bg-[#fbf0d9] border border-amber-200 shadow-sm hover:scale-110 transition-transform m-0.5"></button>
+                            <button onclick="setPaperColor('white')" title="Branco Limpo" class="w-6 h-6 rounded bg-white border border-slate-300 shadow-sm hover:scale-110 transition-transform m-0.5"></button>
+                            <button onclick="setPaperColor('pink')" title="Rosa Pastel" class="w-6 h-6 rounded bg-[#fdf2f4] border border-pink-200 shadow-sm hover:scale-110 transition-transform m-0.5"></button>
+                            <button onclick="setPaperColor('mint')" title="Verde Menta" class="w-6 h-6 rounded bg-[#f0fdf4] border border-emerald-200 shadow-sm hover:scale-110 transition-transform m-0.5"></button>
+                        </div>
+
+                        <!-- Font Selector -->
+                        <select id="fontSelect" onchange="changeFont(this.value)" class="bg-slate-100 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg px-2 py-1.5 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-amber-500 dark:text-white hidden md:block">
+                            <option value="font-handwriting">Escrita Cursiva</option>
+                            <option value="font-indie">Indie Flower</option>
+                            <option value="font-sans">Fonte Padrão (Inter)</option>
+                        </select>
+
+                        <!-- Actions -->
+                        <button onclick="exportToTXT()" title="Exportar Todo o Caderno (TXT)" class="bg-slate-200 dark:bg-slate-600 hover:bg-slate-300 dark:hover:bg-slate-500 px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-all dark:text-white">
+                            <i class="fa-solid fa-file-arrow-down"></i> <span class="hidden xl:inline">TXT</span>
+                        </button>
+
+                        <button onclick="exportCurrentPagePDF()" title="Exportar Página Atual (PDF)" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5 shadow-sm transition-all">
+                            <i class="fa-solid fa-file-pdf"></i> <span class="hidden xl:inline">PDF</span>
+                        </button>
+                        
+                        <button class="save-data-btn bg-green-600 text-white px-3 py-1.5 rounded-lg font-medium text-xs hover:bg-green-700 transition-colors shadow-sm flex items-center">
+                            <i class="fa-solid fa-cloud-arrow-up"></i> <span class="hidden xl:inline ml-1.5">Salvar Nuvem</span>
+                        </button>
+
+                        <!-- Dark/Light Toggle -->
+                        <button onclick="toggleDarkMode()" class="w-8 h-8 rounded-lg bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-slate-700 dark:text-slate-200 hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors">
+                            <i class="fa-solid fa-moon dark:hidden"></i>
+                            <i class="fa-solid fa-sun hidden dark:inline"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Notebook Sheet Content -->
+                <div class="flex-1 overflow-y-auto bg-gray-50 dark:bg-slate-900 border-x border-slate-200 dark:border-slate-700 flex justify-center items-start custom-scrollbar">
+                    <div id="notebook-sheet" class="w-full max-w-4xl shadow-xl mt-4 mb-8 rounded border border-amber-900/10 dark:border-slate-700 relative transition-colors duration-300 bg-[#fbf0d9] dark:bg-slate-800 flex flex-col min-h-[75vh]">
+                        
+                        <!-- Spiral Binding -->
+                        <div class="absolute left-2 sm:left-6 top-0 bottom-0 w-8 hidden md:flex flex-col justify-around items-center py-6 z-10 pointer-events-none opacity-80">
+                            <div class="w-6 h-4 bg-slate-400 dark:bg-slate-600 rounded-full shadow-inner border border-slate-500"></div>
+                            <div class="w-6 h-4 bg-slate-400 dark:bg-slate-600 rounded-full shadow-inner border border-slate-500"></div>
+                            <div class="w-6 h-4 bg-slate-400 dark:bg-slate-600 rounded-full shadow-inner border border-slate-500"></div>
+                            <div class="w-6 h-4 bg-slate-400 dark:bg-slate-600 rounded-full shadow-inner border border-slate-500"></div>
+                            <div class="w-6 h-4 bg-slate-400 dark:bg-slate-600 rounded-full shadow-inner border border-slate-500"></div>
+                            <div class="w-6 h-4 bg-slate-400 dark:bg-slate-600 rounded-full shadow-inner border border-slate-500"></div>
+                            <div class="w-6 h-4 bg-slate-400 dark:bg-slate-600 rounded-full shadow-inner border border-slate-500"></div>
+                            <div class="w-6 h-4 bg-slate-400 dark:bg-slate-600 rounded-full shadow-inner border border-slate-500"></div>
+                            <div class="w-6 h-4 bg-slate-400 dark:bg-slate-600 rounded-full shadow-inner border border-slate-500"></div>
+                            <div class="w-6 h-4 bg-slate-400 dark:bg-slate-600 rounded-full shadow-inner border border-slate-500"></div>
+                            <div class="w-6 h-4 bg-slate-400 dark:bg-slate-600 rounded-full shadow-inner border border-slate-500"></div>
+                            <div class="w-6 h-4 bg-slate-400 dark:bg-slate-600 rounded-full shadow-inner border border-slate-500"></div>
+                        </div>
+
+                        <!-- Page Header -->
+                        <div class="pt-8 pb-4 px-4 sm:px-6 md:pl-20 border-b-2 border-red-400/40 dark:border-red-500/30 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-transparent shrink-0">
+                            <input type="text" id="pageTitle" placeholder="Assunto desta página..." class="w-full sm:w-2/3 bg-transparent text-2xl sm:text-3xl font-bold font-handwriting outline-none border-b border-dashed border-slate-400/50 pb-1 placeholder:text-slate-400/70 dark:placeholder:text-slate-500 dark:text-white" onchange="syncNotebookDOM()">
+                            
+                            <div class="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400 bg-white/50 dark:bg-slate-900/50 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm">
+                                <i class="fa-regular fa-calendar-days text-amber-600"></i>
+                                <input type="date" id="pageGlobalDate" class="bg-transparent border-none outline-none font-medium text-xs cursor-pointer dark:text-white" onchange="updateGlobalDate()">
+                            </div>
+                        </div>
+
+                        <!-- Lined Area -->
+                        <div class="relative flex-1 flex flex-col">
+                            <div class="absolute left-12 sm:left-16 top-0 bottom-0 w-[2px] bg-red-400/50 dark:bg-red-500/40 hidden sm:block pointer-events-none z-0"></div>
+
+                            <div id="linesContainer" class="notebook-page flex-1 w-full pt-2 px-2 sm:px-4 md:pl-20 pr-4 sm:pr-6 font-handwriting text-lg sm:text-xl z-10 page-transition">
+                                <!-- Linhas via JS -->
+                            </div>
+
+                            <div class="px-4 sm:px-6 md:px-20 py-6 flex justify-start items-center">
+                                <button onclick="addNewLine()" class="bg-amber-600 hover:bg-amber-700 active:scale-95 text-white px-4 py-2 rounded-xl text-sm font-sans font-medium flex items-center gap-2 shadow-md transition-all">
+                                    <i class="fa-solid fa-plus"></i> Escrever Nova Linha
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Notebook Footer Pagination -->
+                        <div class="mt-auto border-t border-slate-200 dark:border-slate-700/50 bg-black/5 dark:bg-white/5 px-4 sm:px-6 md:pl-20 py-3 flex flex-wrap justify-between items-center gap-4 shrink-0 rounded-b">
+                            <div class="flex items-center gap-2 bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700 p-1">
+                                <button onclick="prevPage()" id="btnPrevPage" class="w-8 h-8 flex items-center justify-center rounded bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-amber-100 hover:text-amber-700 dark:hover:bg-amber-900/30 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+                                    <i class="fa-solid fa-chevron-left"></i>
+                                </button>
+                                <div class="px-3 font-sans text-sm font-medium text-slate-700 dark:text-slate-300 min-w-[100px] text-center" id="pageIndicator">
+                                    Página 1 de 1
+                                </div>
+                                <button onclick="nextPage()" id="btnNextPage" class="w-8 h-8 flex items-center justify-center rounded bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-amber-100 hover:text-amber-700 dark:hover:bg-amber-900/30 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+                                    <i class="fa-solid fa-chevron-right"></i>
+                                </button>
+                            </div>
+
+                            <div class="flex items-center gap-2">
+                                <button onclick="deleteCurrentPage()" title="Excluir Página Atual" class="text-xs text-red-500 hover:text-red-700 bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/40 px-3 py-2 rounded-lg font-sans font-medium transition-colors flex items-center gap-1.5">
+                                    <i class="fa-solid fa-trash-can"></i> <span class="hidden sm:inline">Excluir Pág.</span>
+                                </button>
+                                <button onclick="addNewPage()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-sm font-sans font-medium flex items-center gap-2 shadow-sm transition-all active:scale-95">
+                                    <i class="fa-solid fa-file-circle-plus"></i> Nova Página
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -209,44 +343,21 @@
                     </div>
                     
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 w-full max-w-5xl px-4">
-                        <a href="#" target="_blank" class="bg-purple-100 hover:bg-purple-200 transition-colors rounded-2xl p-10 flex flex-col items-center justify-center space-y-4 shadow-md hover:shadow-lg group">
+                        <a href="#" class="bg-purple-100 hover:bg-purple-200 transition-colors rounded-2xl p-10 flex flex-col items-center justify-center space-y-4 shadow-md hover:shadow-lg group">
                             <i class="fa-solid fa-folder text-[#fcd34d] text-7xl drop-shadow-sm group-hover:scale-105 transition-transform"></i>
                             <span class="text-purple-900 font-bold text-xl tracking-wide">Atividades</span>
                         </a>
-                        
-                        <a href="#" target="_blank" class="bg-purple-200 hover:bg-purple-300 transition-colors rounded-2xl p-10 flex flex-col items-center justify-center space-y-4 shadow-md hover:shadow-lg group">
+                        <a href="#" class="bg-purple-200 hover:bg-purple-300 transition-colors rounded-2xl p-10 flex flex-col items-center justify-center space-y-4 shadow-md hover:shadow-lg group">
                             <i class="fa-solid fa-folder text-[#fcd34d] text-7xl drop-shadow-sm group-hover:scale-105 transition-transform"></i>
                             <span class="text-purple-900 font-bold text-xl tracking-wide">Relatórios</span>
                         </a>
-                        
-                        <a href="#" target="_blank" class="bg-purple-300 hover:bg-purple-400 transition-colors rounded-2xl p-10 flex flex-col items-center justify-center space-y-4 shadow-md hover:shadow-lg group">
+                        <a href="#" class="bg-purple-300 hover:bg-purple-400 transition-colors rounded-2xl p-10 flex flex-col items-center justify-center space-y-4 shadow-md hover:shadow-lg group">
                             <i class="fa-solid fa-folder text-[#fcd34d] text-7xl drop-shadow-sm group-hover:scale-105 transition-transform"></i>
                             <span class="text-purple-900 font-bold text-xl tracking-wide">Projetos</span>
                         </a>
-                        
-                        <a href="#" target="_blank" class="bg-purple-400 hover:bg-purple-500 transition-colors rounded-2xl p-10 flex flex-col items-center justify-center space-y-4 shadow-md hover:shadow-lg group">
+                        <a href="#" class="bg-purple-400 hover:bg-purple-500 transition-colors rounded-2xl p-10 flex flex-col items-center justify-center space-y-4 shadow-md hover:shadow-lg group">
                             <i class="fa-solid fa-folder text-[#fcd34d] text-7xl drop-shadow-sm group-hover:scale-105 transition-transform"></i>
                             <span class="text-white font-bold text-xl tracking-wide drop-shadow-md">Documentos</span>
-                        </a>
-
-                        <a href="#" target="_blank" class="bg-purple-500 hover:bg-purple-600 transition-colors rounded-2xl p-10 flex flex-col items-center justify-center space-y-4 shadow-md hover:shadow-lg group">
-                            <i class="fa-solid fa-folder text-[#fcd34d] text-7xl drop-shadow-sm group-hover:scale-105 transition-transform"></i>
-                            <span class="text-white font-bold text-xl tracking-wide drop-shadow-md">Imagens</span>
-                        </a>
-
-                        <a href="#" target="_blank" class="bg-purple-600 hover:bg-purple-700 transition-colors rounded-2xl p-10 flex flex-col items-center justify-center space-y-4 shadow-md hover:shadow-lg group">
-                            <i class="fa-solid fa-folder text-[#fcd34d] text-7xl drop-shadow-sm group-hover:scale-105 transition-transform"></i>
-                            <span class="text-white font-bold text-xl tracking-wide drop-shadow-md">Vídeos</span>
-                        </a>
-
-                        <a href="#" target="_blank" class="bg-purple-700 hover:bg-purple-800 transition-colors rounded-2xl p-10 flex flex-col items-center justify-center space-y-4 shadow-md hover:shadow-lg group">
-                            <i class="fa-solid fa-folder text-[#fcd34d] text-7xl drop-shadow-sm group-hover:scale-105 transition-transform"></i>
-                            <span class="text-white font-bold text-xl tracking-wide drop-shadow-md">Planilhas</span>
-                        </a>
-
-                        <a href="#" target="_blank" class="bg-purple-800 hover:bg-purple-900 transition-colors rounded-2xl p-10 flex flex-col items-center justify-center space-y-4 shadow-md hover:shadow-lg group">
-                            <i class="fa-solid fa-folder text-[#fcd34d] text-7xl drop-shadow-sm group-hover:scale-105 transition-transform"></i>
-                            <span class="text-white font-bold text-xl tracking-wide drop-shadow-md">Notas de alunos</span>
                         </a>
                     </div>
                 </div>
@@ -276,7 +387,7 @@
                     <div class="flex items-center space-x-2">
                         <label class="font-bold text-sm text-gray-700">Mês/Ano:</label>
                         <input type="month" id="month-selector" value="2026-10" class="border border-gray-300 rounded px-2 py-1.5 text-sm outline-none focus:border-brand-purple bg-white">
-                        <button id="save-frequencia-btn" class="save-data-btn ml-2 bg-green-600 text-white px-4 py-1.5 rounded font-medium text-sm hover:bg-green-700 transition-colors shadow-sm flex items-center">
+                        <button class="save-data-btn ml-2 bg-green-600 text-white px-4 py-1.5 rounded font-medium text-sm hover:bg-green-700 transition-colors shadow-sm flex items-center">
                             <i class="fa-solid fa-floppy-disk mr-2"></i> <span>Salvar</span>
                         </button>
                     </div>
@@ -313,7 +424,6 @@
                         </select>
                     </div>
                     <div class="flex items-center space-x-2 flex-1 justify-end">
-                         <span class="text-sm font-semibold text-brand-purple bg-brand-purple/10 px-3 py-1.5 rounded-full hidden sm:inline-flex"><i class="fa-solid fa-calculator mr-1"></i> Faltas calculadas pela Frequência</span>
                          <button class="save-data-btn ml-2 bg-green-600 text-white px-4 py-1.5 rounded font-medium text-sm hover:bg-green-700 transition-colors shadow-sm flex items-center">
                              <i class="fa-solid fa-floppy-disk mr-2"></i> <span>Salvar</span>
                          </button>
@@ -356,6 +466,9 @@
         window.cloudReady = true;
 
         window.saveDataToCloud = async function() {
+            // Sincroniza qualquer estado do DOM do caderno antes de subir para a nuvem
+            if (window.syncNotebookDOM) window.syncNotebookDOM();
+
             const payload = {
                 id: 1,
                 dados: JSON.parse(JSON.stringify(window.getAllData()))
@@ -400,6 +513,7 @@
 
     <!-- Main Logic -->
     <script>
+        // UI / Sidebar Logic
         const sidebar = document.getElementById('sidebar');
         const toggleBtn = document.getElementById('toggleBtn');
         const overlay = document.getElementById('sidebarOverlay');
@@ -430,7 +544,9 @@
         window.addEventListener('resize', handleResize);
         handleResize();
 
-        // --- Dados organizados por turma ---
+        // ----------------------------------------------------
+        // GESTÃO DE DADOS GLOBAIS (Turmas)
+        // ----------------------------------------------------
         window.TURMAS = [
             { id: '5', label: '5º Ano A' },
             { id: '6', label: '6º Ano A' },
@@ -438,6 +554,7 @@
             { id: '8', label: '8º Ano A' },
             { id: '9', label: '9º Ano A' }
         ];
+        
         const ALUNOS_INICIAIS_5 = [
             "ANNA LUYZA DA SILVA TOMAZELLI",
             "ARTHUR GENILSON DA SILVA BATISTA",
@@ -448,17 +565,27 @@
             "FELIPE ALMEIDA SANTOS",
             "GABRIELA FERNANDES RIBEIRO"
         ];
+        
+        // Estrutura Padrão Inicial
         window.turmaData = {};
         window.TURMAS.forEach(t => {
             window.turmaData[t.id] = {
                 students: t.id === '5' ? ALUNOS_INICIAIS_5.slice() : [],
                 studentGrades: {},
-                attendanceState: {}
+                attendanceState: {},
+                // Novo objeto para o Caderno (isolado por turma)
+                notebookData: {
+                    notebookTitle: 'Caderno de Conteúdo',
+                    theme: 'classic',
+                    font: 'font-handwriting',
+                    pages: []
+                }
             };
         });
+        
         window.currentTurma = '5';
+        window.notebookPageIndex = 0;
 
-        // students / studentGrades / attendanceState sempre apontam para a turma selecionada
         window.bindTurma = function(id) {
             if (!window.turmaData[id]) id = '5';
             const d = window.turmaData[id];
@@ -466,11 +593,12 @@
             window.students = d.students;
             window.studentGrades = d.studentGrades;
             window.attendanceState = d.attendanceState;
+            window.notebookPageIndex = 0; // Reseta para a pág 1 ao trocar de turma
         };
         window.bindTurma('5');
 
         window.getAllData = function() {
-            return { version: 2, turmas: window.turmaData };
+            return { version: 3, turmas: window.turmaData };
         };
 
         window.applyLoadedData = function(d) {
@@ -482,17 +610,16 @@
                         window.turmaData[t.id] = {
                             students: src.students || [],
                             studentGrades: src.studentGrades || {},
-                            attendanceState: src.attendanceState || {}
+                            attendanceState: src.attendanceState || {},
+                            notebookData: src.notebookData || {
+                                notebookTitle: 'Caderno de Conteúdo',
+                                theme: 'classic',
+                                font: 'font-handwriting',
+                                pages: []
+                            }
                         };
                     }
                 });
-            } else if (d.students || d.studentGrades || d.attendanceState) {
-                // Formato antigo (sem turmas): os dados vão para o 5º Ano A
-                window.turmaData['5'] = {
-                    students: d.students || window.turmaData['5'].students,
-                    studentGrades: d.studentGrades || {},
-                    attendanceState: d.attendanceState || {}
-                };
             }
             window.bindTurma(window.currentTurma);
         };
@@ -500,17 +627,18 @@
         window.cloudReady = false; 
         window.STORAGE_KEY = 'sistemaPereiraData';
 
-        // Backup local
+        // Backup Local
         try {
             const saved = localStorage.getItem(window.STORAGE_KEY);
-            if (saved) {
-                window.applyLoadedData(JSON.parse(saved));
-            }
-        } catch (e) {
-            console.warn("Não foi possível ler o backup local:", e);
+            if (saved) { window.applyLoadedData(JSON.parse(saved)); }
+        } catch (e) { console.warn("Erro ao ler backup local:", e); }
+
+        window.saveLocalBackup = function() {
+            try { localStorage.setItem(window.STORAGE_KEY, JSON.stringify(window.getAllData())); } 
+            catch (e) { console.error("Erro ao salvar localmente:", e); }
         }
 
-        // Avisos na tela
+        // Toasts / Avisos
         window.showToast = function(message, type) {
             let box = document.getElementById('toast-box');
             if (!box) {
@@ -528,37 +656,20 @@
         };
 
         window.explainCloudError = function(e) {
-            if (typeof window.saveDataToCloud !== 'function') {
-                return 'Não foi possível carregar a biblioteca do Supabase. Verifique a conexão com a internet.';
-            }
+            if (typeof window.saveDataToCloud !== 'function') return 'Sem Supabase instalado.';
             const msg = (e && e.message) ? e.message : String(e);
-            const code = e && e.code;
-            if (/failed to fetch|networkerror|load failed/i.test(msg)) {
-                return 'Sem conexão com o Supabase. Verifique a internet e se a URL do projeto está correta.';
-            }
-            if (code === '42P01' || code === 'PGRST205' || /does not exist|schema cache/i.test(msg)) {
-                return 'A tabela "escola_dados" não existe. Rode o SQL de criação no Supabase (SQL Editor).';
-            }
-            if (code === '42501' || /row-level security/i.test(msg)) {
-                return 'Permissão negada (RLS). Crie as políticas de acesso da tabela "escola_dados".';
-            }
-            if (code === '428C9' || /non-DEFAULT value|identity/i.test(msg)) {
-                return 'A coluna "id" é de identidade "always". Rode: alter table public.escola_dados alter column id set generated by default;';
-            }
-            if (/invalid api key|jwt|apikey/i.test(msg)) {
-                return 'Chave do Supabase inválida. Copie a chave "anon public" em Project Settings > API.';
-            }
-            return 'Erro do Supabase: ' + msg;
+            if (/failed to fetch|networkerror/i.test(msg)) return 'Sem conexão com a Internet.';
+            return 'Erro Supabase: ' + msg;
         };
 
         window.saveAllData = async function() {
             const result = { local: false, cloud: false, message: '' };
+            if(window.syncNotebookDOM) window.syncNotebookDOM();
+            
             try {
-                localStorage.setItem(window.STORAGE_KEY, JSON.stringify(window.getAllData()));
+                window.saveLocalBackup();
                 result.local = true;
-            } catch (e) {
-                console.error("Erro ao salvar localmente:", e);
-            }
+            } catch (e) {}
 
             if (typeof window.saveDataToCloud !== 'function') {
                 result.message = window.explainCloudError(null);
@@ -567,16 +678,14 @@
             try {
                 await window.saveDataToCloud();
                 result.cloud = true;
-            } catch (e) {
-                result.message = window.explainCloudError(e);
-            }
+            } catch (e) { result.message = window.explainCloudError(e); }
             return result;
         };
 
         window.handleSave = async function(btn) {
             if (!btn || btn.disabled) return;
             const originalHTML = btn.innerHTML;
-            const allColors = ['bg-green-600', 'hover:bg-green-700', 'bg-emerald-500', 'bg-amber-500', 'bg-red-500'];
+            const allColors = ['bg-green-600', 'hover:bg-green-700', 'bg-emerald-500', 'bg-red-500'];
             const setColor = (cls) => {
                 btn.classList.remove(...allColors);
                 btn.classList.add(...cls.split(' '));
@@ -593,7 +702,7 @@
             } else {
                 btn.innerHTML = '<i class="fa-solid fa-triangle-exclamation mr-2"></i> <span>Erro ao Salvar</span>';
                 setColor('bg-red-500');
-                window.showToast(r.message + (r.local ? ' (Uma cópia foi salva neste navegador.)' : ''), 'error');
+                window.showToast(r.message, 'error');
             }
 
             setTimeout(() => {
@@ -603,13 +712,357 @@
             }, 2500);
         };
 
+        // ----------------------------------------------------
+        // LÓGICA DO CADERNO (Listar Conteúdo)
+        // ----------------------------------------------------
+        
+        function getActiveNotebook() {
+            return window.turmaData[window.currentTurma].notebookData;
+        }
+
+        window.syncNotebookDOM = function() {
+            const data = getActiveNotebook();
+            if (data.pages.length === 0 || !data.pages[window.notebookPageIndex]) return;
+            
+            data.notebookTitle = document.getElementById('notebookGlobalTitle').value;
+            
+            const page = data.pages[window.notebookPageIndex];
+            page.title = document.getElementById('pageTitle').value;
+            page.globalDate = document.getElementById('pageGlobalDate').value;
+            
+            const lineElements = document.querySelectorAll('.notebook-line-row');
+            page.lines = [];
+            lineElements.forEach(el => {
+                const dateInput = el.querySelector('.line-date');
+                const textInput = el.querySelector('.line-text');
+                if (dateInput && textInput) {
+                    page.lines.push({ date: dateInput.value, text: textInput.value });
+                }
+            });
+            window.saveLocalBackup(); // Auto-save local apenas
+        }
+
+        window.renderNotebookPage = function() {
+            const data = getActiveNotebook();
+            
+            // Se a turma estiver sem páginas, cria uma inicial.
+            if (!data.pages || data.pages.length === 0) {
+                const today = new Date().toISOString().split('T')[0];
+                data.pages = [{
+                    title: 'Anotações da Turma',
+                    globalDate: today,
+                    lines: [{ date: today, text: 'Registro de aulas...' }]
+                }];
+            }
+            
+            if (window.notebookPageIndex >= data.pages.length) {
+                window.notebookPageIndex = Math.max(0, data.pages.length - 1);
+            }
+
+            const page = data.pages[window.notebookPageIndex];
+            const container = document.getElementById('linesContainer');
+            
+            // UI Global
+            document.getElementById('notebookGlobalTitle').value = data.notebookTitle || '';
+            document.getElementById('pageTitle').value = page.title || '';
+            document.getElementById('pageGlobalDate').value = page.globalDate || new Date().toISOString().split('T')[0];
+            
+            // Tema e Fonte
+            document.getElementById('fontSelect').value = data.font || 'font-handwriting';
+            changeFont(data.font || 'font-handwriting', false);
+            setPaperColor(data.theme || 'classic', false);
+
+            // Animação CSS
+            container.classList.remove('page-transition');
+            void container.offsetWidth; 
+            container.classList.add('page-transition');
+
+            container.innerHTML = '';
+            
+            if (page.lines && page.lines.length > 0) {
+                page.lines.forEach((line, index) => {
+                    container.appendChild(createNotebookLine(line, index));
+                });
+            } else {
+                const defaultLine = { date: page.globalDate, text: '' };
+                page.lines = [defaultLine];
+                container.appendChild(createNotebookLine(defaultLine, 0));
+            }
+            updateNotebookPagination();
+        }
+
+        function createNotebookLine(line, index) {
+            const row = document.createElement('div');
+            row.className = 'notebook-line-row notebook-line flex items-center gap-1 sm:gap-2 group relative w-full';
+            row.innerHTML = `
+                <div class="flex items-center shrink-0 w-24 sm:w-28 md:w-32">
+                    <input type="date" value="${line.date || ''}" 
+                        class="line-date text-[10px] sm:text-xs bg-white/60 dark:bg-slate-900/60 border border-slate-300 dark:border-slate-600 rounded px-1 py-0.5 text-slate-600 dark:text-slate-300 outline-none w-full font-sans focus:ring-1 focus:ring-amber-500 transition-shadow shadow-sm"
+                        onchange="syncNotebookDOM()">
+                </div>
+                <div class="flex-1 relative min-w-0">
+                    <input type="text" value="${escapeHtml(line.text)}" 
+                        class="line-date line-text w-full bg-transparent outline-none border-b border-transparent focus:border-amber-500/50 text-slate-800 dark:text-slate-100 placeholder:text-slate-400/50 font-inherit"
+                        placeholder="Escreva aqui..."
+                        oninput="syncNotebookDOM()"
+                        onkeydown="handleNotebookKeydown(event, ${index})">
+                </div>
+                <button onclick="deleteNotebookLine(${index})" title="Excluir linha" class="shrink-0 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 text-red-500 hover:text-red-700 bg-red-50 dark:bg-red-900/30 hover:bg-red-100 dark:hover:bg-red-900/50 p-1.5 rounded transition-all text-xs">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            `;
+            return row;
+        }
+
+        function updateNotebookPagination() {
+            const data = getActiveNotebook();
+            const total = data.pages.length;
+            document.getElementById('pageIndicator').innerText = `Página ${window.notebookPageIndex + 1} de ${total}`;
+            document.getElementById('btnPrevPage').disabled = window.notebookPageIndex === 0;
+            document.getElementById('btnNextPage').disabled = window.notebookPageIndex === total - 1;
+        }
+
+        window.nextPage = function() {
+            const data = getActiveNotebook();
+            if (window.notebookPageIndex < data.pages.length - 1) {
+                window.syncNotebookDOM();
+                window.notebookPageIndex++;
+                window.renderNotebookPage();
+            }
+        }
+        window.prevPage = function() {
+            if (window.notebookPageIndex > 0) {
+                window.syncNotebookDOM();
+                window.notebookPageIndex--;
+                window.renderNotebookPage();
+            }
+        }
+
+        window.addNewPage = function() {
+            window.syncNotebookDOM();
+            const data = getActiveNotebook();
+            const today = new Date().toISOString().split('T')[0];
+            const newPage = {
+                title: `Página ${data.pages.length + 1}`,
+                globalDate: today,
+                lines: [{ date: today, text: '' }]
+            };
+            data.pages.push(newPage);
+            window.notebookPageIndex = data.pages.length - 1;
+            window.renderNotebookPage();
+            window.saveLocalBackup();
+            setTimeout(() => document.getElementById('pageTitle').focus(), 100);
+        }
+
+        window.deleteCurrentPage = function() {
+            const data = getActiveNotebook();
+            if (data.pages.length <= 1) {
+                window.showToast('Você não pode excluir a única página da turma.', 'warning');
+                return;
+            }
+            if (confirm(`Tem certeza que deseja excluir a Página ${window.notebookPageIndex + 1}?`)) {
+                data.pages.splice(window.notebookPageIndex, 1);
+                if (window.notebookPageIndex >= data.pages.length) {
+                    window.notebookPageIndex = data.pages.length - 1;
+                }
+                window.renderNotebookPage();
+                window.saveLocalBackup();
+            }
+        }
+
+        window.addNewLine = function() {
+            window.syncNotebookDOM();
+            const data = getActiveNotebook();
+            const page = data.pages[window.notebookPageIndex];
+            
+            let newDate = page.globalDate;
+            if (page.lines.length > 0) newDate = page.lines[page.lines.length - 1].date || newDate;
+            
+            page.lines.push({ date: newDate, text: '' });
+            window.renderNotebookPage();
+            setTimeout(() => {
+                const inputs = document.querySelectorAll('.line-text');
+                if (inputs.length > 0) inputs[inputs.length - 1].focus();
+            }, 50);
+        }
+
+        window.deleteNotebookLine = function(index) {
+            window.syncNotebookDOM();
+            const data = getActiveNotebook();
+            const page = data.pages[window.notebookPageIndex];
+            
+            if (page.lines.length > 1) {
+                page.lines.splice(index, 1);
+            } else {
+                page.lines[0].text = ''; 
+            }
+            window.renderNotebookPage();
+        }
+
+        window.handleNotebookKeydown = function(event, index) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                window.syncNotebookDOM();
+                const page = getActiveNotebook().pages[window.notebookPageIndex];
+                const currentDate = page.lines[index].date || page.globalDate;
+                
+                page.lines.splice(index + 1, 0, { date: currentDate, text: '' });
+                window.renderNotebookPage();
+                
+                setTimeout(() => {
+                    const inputs = document.querySelectorAll('.line-text');
+                    if (inputs[index + 1]) inputs[index + 1].focus();
+                }, 50);
+            } else if (event.key === 'Backspace' && event.target.value === '') {
+                const page = getActiveNotebook().pages[window.notebookPageIndex];
+                if (page.lines.length > 1) {
+                    event.preventDefault();
+                    window.syncNotebookDOM();
+                    page.lines.splice(index, 1);
+                    window.renderNotebookPage();
+                    setTimeout(() => {
+                        const inputs = document.querySelectorAll('.line-text');
+                        const targetIndex = Math.max(0, index - 1);
+                        if (inputs[targetIndex]) inputs[targetIndex].focus();
+                    }, 50);
+                }
+            }
+        }
+
+        window.updateGlobalDate = function() {
+            const novaData = document.getElementById('pageGlobalDate').value;
+            window.syncNotebookDOM();
+            const page = getActiveNotebook().pages[window.notebookPageIndex];
+            let updated = false;
+            page.lines.forEach(line => {
+                if (line.text.trim() === '' || !line.date) {
+                    line.date = novaData;
+                    updated = true;
+                }
+            });
+            if(updated) window.renderNotebookPage();
+        }
+
+        window.setPaperColor = function(theme, save = true) {
+            const data = getActiveNotebook();
+            data.theme = theme;
+            const sheet = document.getElementById('notebook-sheet');
+            
+            sheet.classList.remove('bg-[#fbf0d9]', 'bg-white', 'bg-[#fdf2f4]', 'bg-[#f0fdf4]');
+            
+            const isDark = document.documentElement.classList.contains('dark');
+            if (!isDark) {
+                if (theme === 'classic') sheet.style.backgroundColor = '#fbf0d9';
+                else if (theme === 'white') sheet.style.backgroundColor = '#ffffff';
+                else if (theme === 'pink') sheet.style.backgroundColor = '#fdf2f4';
+                else if (theme === 'mint') sheet.style.backgroundColor = '#f0fdf4';
+            } else {
+                sheet.style.backgroundColor = ''; 
+            }
+            if (save) window.saveLocalBackup();
+        }
+
+        window.changeFont = function(fontClass, save = true) {
+            const data = getActiveNotebook();
+            data.font = fontClass;
+            const container = document.getElementById('linesContainer');
+            container.className = container.className.replace(/font-\w+/g, '').trim();
+            container.classList.add(fontClass);
+            if (save) window.saveLocalBackup();
+        }
+
+        window.toggleDarkMode = function() {
+            const html = document.documentElement;
+            html.classList.toggle('dark');
+            
+            if (html.classList.contains('dark')) {
+                document.getElementById('notebook-sheet').style.backgroundColor = '';
+            } else {
+                window.setPaperColor(getActiveNotebook().theme || 'classic', false);
+            }
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+        }
+
+        window.exportToTXT = function() {
+            window.syncNotebookDOM();
+            const data = getActiveNotebook();
+            const turmaLabel = window.TURMAS.find(t => t.id === window.currentTurma)?.label || 'Turma';
+            
+            let content = `========================================\n`;
+            content += ` CADERNO: ${data.notebookTitle || 'Sem Título'} - ${turmaLabel}\n`;
+            content += ` EXPORTADO EM: ${new Date().toLocaleString()}\n`;
+            content += `========================================\n\n`;
+
+            data.pages.forEach((page, pIdx) => {
+                content += `--- PÁGINA ${pIdx + 1}: ${page.title || 'Sem assunto'} (${page.globalDate}) ---\n`;
+                page.lines.forEach(line => {
+                    if (line.text.trim() !== '') {
+                        content += `[${line.date || '--/--/----'}] ${line.text}\n`;
+                    }
+                });
+                content += `\n`;
+            });
+
+            const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            const filename = (data.notebookTitle || 'caderno').replace(/[^a-z0-9]/gi, '_').toLowerCase();
+            a.download = `${filename}_${turmaLabel}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        window.exportCurrentPagePDF = function() {
+            window.syncNotebookDOM();
+            const element = document.getElementById('notebook-sheet');
+            
+            const paginationControls = element.querySelector('.mt-auto');
+            const addBtn = element.querySelector('.fa-plus').parentElement.parentElement;
+            
+            paginationControls.style.display = 'none';
+            addBtn.style.display = 'none';
+            
+            const originalShadow = element.style.boxShadow;
+            element.style.boxShadow = 'none';
+            element.classList.remove('min-h-[75vh]');
+
+            const data = getActiveNotebook();
+            const page = data.pages[window.notebookPageIndex];
+            const title = (page.title || `Pagina_${window.notebookPageIndex + 1}`).replace(/[^a-z0-9]/gi, '_').toLowerCase();
+
+            const opt = {
+                margin:       10,
+                filename:     `caderno_${title}.pdf`,
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            html2pdf().from(element).set(opt).save().then(() => {
+                paginationControls.style.display = 'flex';
+                addBtn.style.display = 'flex';
+                element.style.boxShadow = originalShadow;
+                element.classList.add('min-h-[75vh]');
+            });
+        }
+
+
+        // ----------------------------------------------------
+        // LÓGICA DE FREQUÊNCIA, BOLETIM E ROTAS
+        // ----------------------------------------------------
+        
         window.generateTable = function(monthStr) {
+            // (Lógica da Tabela de Frequência - Mantida intacta do último código)
             const [year, month] = monthStr.split('-');
             const daysInMonth = new Date(year, month, 0).getDate();
-            
-            if (!window.attendanceState[monthStr]) {
-                window.attendanceState[monthStr] = {};
-            }
+            if (!window.attendanceState[monthStr]) window.attendanceState[monthStr] = {};
 
             let theadHtml = `<tr><th class="sticky left-0 bg-[#1e293b] z-30 p-4 text-left border-r border-gray-600 min-w-[280px]">Nome do Aluno</th>`;
             let validDays = [];
@@ -617,7 +1070,6 @@
             for (let d = 1; d <= daysInMonth; d++) {
                 const date = new Date(year, month - 1, d);
                 const dayOfWeek = date.getDay();
-                
                 if (dayOfWeek !== 0 && dayOfWeek !== 6) { 
                     validDays.push(d);
                     const dayStr = String(d).padStart(2, '0');
@@ -639,10 +1091,7 @@
             window.students.forEach((student, index) => {
                 const isEven = index % 2 === 0;
                 const rowClass = isEven ? 'bg-white' : 'bg-gray-50';
-                
-                if (!window.attendanceState[monthStr][student]) {
-                    window.attendanceState[monthStr][student] = {};
-                }
+                if (!window.attendanceState[monthStr][student]) window.attendanceState[monthStr][student] = {};
 
                 tbodyHtml += `<tr class="border-b border-gray-200 hover:bg-gray-100 group transition-colors">`;
                 tbodyHtml += `<td class="sticky left-0 ${rowClass} group-hover:bg-gray-100 z-10 p-4 text-left border-r border-gray-200 font-medium whitespace-nowrap shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)] transition-colors">
@@ -655,31 +1104,14 @@
                               </td>`;
                 
                 validDays.forEach((d) => {
-                    let rawState = window.attendanceState[monthStr][student][d];
-                    let state = rawState;
+                    let state = window.attendanceState[monthStr][student][d];
+                    if (state === true) { state = 'P'; window.attendanceState[monthStr][student][d] = 'P'; }
+                    else if (state === false || state === undefined) { state = null; window.attendanceState[monthStr][student][d] = null; }
 
-                    // Migração de dados legados: true -> 'P' / false e undefined -> null (em branco)
-                    if (rawState === true) {
-                        state = 'P';
-                        window.attendanceState[monthStr][student][d] = 'P';
-                    } else if (rawState === false || rawState === undefined) {
-                        state = null;
-                        window.attendanceState[monthStr][student][d] = null;
-                    }
-
-                    let icon = '';
-                    let btnClass = 'w-6 h-6 rounded flex items-center justify-center text-xs font-bold transition-colors shadow-sm border ';
-
-                    if (state === 'P') {
-                        icon = '<i class="fa-solid fa-check"></i>';
-                        btnClass += 'bg-green-100 text-green-600 border-green-300 hover:bg-green-200';
-                    } else if (state === 'F') {
-                        icon = '<i class="fa-solid fa-xmark"></i>';
-                        btnClass += 'bg-red-100 text-red-600 border-red-300 hover:bg-red-200';
-                    } else {
-                        icon = '-';
-                        btnClass += 'bg-gray-100 text-gray-400 border-gray-200 hover:bg-gray-200';
-                    }
+                    let icon = ''; let btnClass = 'w-6 h-6 rounded flex items-center justify-center text-xs font-bold transition-colors shadow-sm border ';
+                    if (state === 'P') { icon = '<i class="fa-solid fa-check"></i>'; btnClass += 'bg-green-100 text-green-600 border-green-300 hover:bg-green-200'; }
+                    else if (state === 'F') { icon = '<i class="fa-solid fa-xmark"></i>'; btnClass += 'bg-red-100 text-red-600 border-red-300 hover:bg-red-200'; }
+                    else { icon = '-'; btnClass += 'bg-gray-100 text-gray-400 border-gray-200 hover:bg-gray-200'; }
                     
                     tbodyHtml += `<td class="p-2 border-r border-gray-200 ${rowClass} group-hover:bg-gray-100 transition-colors text-center">
                                     <button onclick="cycleAttendance(this, '${monthStr}', '${student.replace(/'/g, "\\'")}', ${d})" class="mx-auto ${btnClass}" data-state="${state}">
@@ -689,9 +1121,7 @@
                 });
                 tbodyHtml += `</tr>`;
             });
-            if (window.students.length === 0) {
-                tbodyHtml = '<tr><td class="p-6 text-left text-gray-400" colspan="' + (validDays.length + 1) + '">Nenhum aluno nesta turma. Use "Adicionar Aluno" acima.</td></tr>';
-            }
+            if (window.students.length === 0) { tbodyHtml = '<tr><td class="p-6 text-left text-gray-400" colspan="' + (validDays.length + 1) + '">Nenhum aluno nesta turma. Use "Adicionar Aluno" acima.</td></tr>'; }
             document.getElementById('frequencia-tbody').innerHTML = tbodyHtml;
         }
 
@@ -702,14 +1132,12 @@
             let currentState = window.attendanceState[monthStr][student][day];
             let newState;
             
-            // Ciclo: Nulo -> Presença (P) -> Falta (F) -> Nulo
             if (currentState === null || currentState === undefined) newState = 'P';
             else if (currentState === 'P') newState = 'F';
             else newState = null;
 
             window.attendanceState[monthStr][student][day] = newState;
 
-            // Atualiza a UI do botão
             btn.dataset.state = newState;
             if (newState === 'P') {
                 btn.innerHTML = '<i class="fa-solid fa-check"></i>';
@@ -721,7 +1149,6 @@
                 btn.innerHTML = '-';
                 btn.className = 'mx-auto w-6 h-6 rounded flex items-center justify-center text-xs font-bold transition-colors shadow-sm border bg-gray-100 text-gray-400 border-gray-200 hover:bg-gray-200';
             }
-
             window.generateBoletimTable();
         }
 
@@ -755,6 +1182,7 @@
         }
 
         window.generateBoletimTable = function() {
+            // (Lógica do Boletim - Mantida intacta do último código)
             const turmaSelect = document.getElementById('boletim-turma-select');
             const is5thGrade = turmaSelect ? turmaSelect.value === '5' : true;
             const bimestreSelect = document.getElementById('boletim-bimestre-select');
@@ -768,13 +1196,9 @@
             const evaluations = ['Av. 1', 'Av. 2', 'Av. 3', 'Av. 4'];
 
             if (is5thGrade) {
-                subjects5th.forEach(sub => {
-                    theadHtml += `<th class="p-4 border-r border-gray-600 font-medium min-w-[80px]">${sub}</th>`;
-                });
+                subjects5th.forEach(sub => { theadHtml += `<th class="p-4 border-r border-gray-600 font-medium min-w-[80px]">${sub}</th>`; });
             } else {
-                evaluations.forEach(ev => {
-                    theadHtml += `<th class="p-4 border-r border-gray-600 font-medium min-w-[80px]">${ev}</th>`;
-                });
+                evaluations.forEach(ev => { theadHtml += `<th class="p-4 border-r border-gray-600 font-medium min-w-[80px]">${ev}</th>`; });
                 theadHtml += `<th class="p-4 border-r border-gray-600 font-bold min-w-[80px]">Média</th>`;
             }
             theadHtml += `</tr>`;
@@ -792,7 +1216,6 @@
 
                 let faltas = 0;
                 if (freqRows[index]) {
-                    // Contabiliza apenas os botões explicitamente marcados como 'F' (Falta)
                     const btns = freqRows[index].querySelectorAll('button[data-state="F"]');
                     faltas = btns.length;
                 }
@@ -824,8 +1247,7 @@
                     });
                     
                     const mediaVal = window.calculateMedia(student);
-                    let mediaClass = "text-gray-700";
-                    let mediaText = "";
+                    let mediaClass = "text-gray-700"; let mediaText = "";
                     if (mediaVal !== null) {
                         mediaText = mediaVal.toFixed(1);
                         mediaClass = mediaVal < 6.0 ? "text-red-600 font-bold" : "text-green-600 font-bold";
@@ -837,9 +1259,7 @@
                 }
                 tbodyHtml += `</tr>`;
             });
-            if (window.students.length === 0) {
-                tbodyHtml = '<tr><td class="p-6 text-left text-gray-400" colspan="12">Nenhum aluno nesta turma.</td></tr>';
-            }
+            if (window.students.length === 0) { tbodyHtml = '<tr><td class="p-6 text-left text-gray-400" colspan="12">Nenhum aluno nesta turma.</td></tr>'; }
             document.getElementById('boletim-tbody').innerHTML = tbodyHtml;
         }
 
@@ -858,7 +1278,6 @@
             
             const mediaVal = window.calculateMedia(student);
             const mediaSpan = document.getElementById(`media-${index}`);
-            
             if (mediaVal !== null) {
                 mediaSpan.innerText = mediaVal.toFixed(1);
                 mediaSpan.className = mediaVal < 6.0 ? "text-red-600 font-bold" : "text-green-600 font-bold";
@@ -871,9 +1290,7 @@
         window.calculateMedia = function(student) {
             const currentBimestre = document.getElementById('boletim-bimestre-select').value;
             const evals = ['Av. 1', 'Av. 2', 'Av. 3', 'Av. 4'];
-            let sum = 0;
-            let count = 0;
-            
+            let sum = 0; let count = 0;
             if (!window.studentGrades[student] || !window.studentGrades[student][currentBimestre]) return null;
 
             evals.forEach(ev => {
@@ -881,13 +1298,9 @@
                 if (valStr && valStr.trim() !== '') {
                     valStr = valStr.replace(',', '.');
                     const val = parseFloat(valStr);
-                    if (!isNaN(val)) {
-                        sum += val;
-                        count++;
-                    }
+                    if (!isNaN(val)) { sum += val; count++; }
                 }
             });
-            
             return count > 0 ? (sum / count) : null;
         }
 
@@ -903,24 +1316,31 @@
             }
         }
 
+        // ATUALIZAÇÃO GERAL AO TROCAR DE TURMA
         window.refreshAll = function() {
-            ['frequencia-turma-select', 'boletim-turma-select'].forEach(id => {
+            ['frequencia-turma-select', 'boletim-turma-select', 'caderno-turma-select'].forEach(id => {
                 const el = document.getElementById(id);
                 if (el) el.value = window.currentTurma;
             });
+            
             const m = document.getElementById('month-selector');
             if (m) window.generateTable(m.value);
             window.generateBoletimTable();
             window.updatePrintHeader();
+            
+            // Renderiza o caderno da turma correta
+            window.renderNotebookPage();
         };
 
         window.setTurma = function(id) {
+            if(window.syncNotebookDOM) window.syncNotebookDOM(); // Salva estado atual antes de trocar
             window.bindTurma(id);
             try { localStorage.setItem('sistemaPereiraTurma', window.currentTurma); } catch (e) {}
             window.refreshAll();
         };
 
-        ['frequencia-turma-select', 'boletim-turma-select'].forEach(id => {
+        // Listeners de Turma
+        ['frequencia-turma-select', 'boletim-turma-select', 'caderno-turma-select'].forEach(id => {
             const el = document.getElementById(id);
             if (el) el.addEventListener('change', (e) => window.setTurma(e.target.value));
         });
@@ -932,21 +1352,17 @@
             });
         }
 
+        // Carrega estado inicial
         try {
             const lastTurma = localStorage.getItem('sistemaPereiraTurma');
             if (lastTurma && window.turmaData[lastTurma]) window.bindTurma(lastTurma);
         } catch (e) {}
-        ['frequencia-turma-select', 'boletim-turma-select'].forEach(id => {
-            const el = document.getElementById(id);
-            if (el) el.value = window.currentTurma;
-        });
-        window.updatePrintHeader();
+        
+        window.refreshAll();
 
         const monthInput = document.getElementById('month-selector');
         if (monthInput) {
-            monthInput.addEventListener('change', (e) => {
-                window.generateTable(e.target.value);
-            });
+            monthInput.addEventListener('change', (e) => { window.generateTable(e.target.value); });
             window.generateTable(monthInput.value);
         }
 
@@ -955,40 +1371,40 @@
         });
 
         const addStudentBtn = document.getElementById('add-student-btn');
-        if (addStudentBtn) {
-            addStudentBtn.addEventListener('click', window.addStudent);
-        }
+        if (addStudentBtn) addStudentBtn.addEventListener('click', window.addStudent);
         
         const newStudentInput = document.getElementById('new-student-name');
         if (newStudentInput) {
             newStudentInput.addEventListener('keypress', function (e) {
-                if (e.key === 'Enter') {
-                    window.addStudent();
-                }
+                if (e.key === 'Enter') window.addStudent();
             });
         }
 
         window.showView = function(viewName) {
-            document.getElementById('default-view').classList.add('hidden');
-            document.getElementById('frequencia-view').classList.add('hidden');
-            document.getElementById('boletim-view').classList.add('hidden');
-            document.getElementById('registro-view').classList.add('hidden');
+            ['default-view', 'frequencia-view', 'boletim-view', 'registro-view', 'caderno-view'].forEach(id => {
+                document.getElementById(id).classList.add('hidden');
+            });
              
             if (viewName === 'frequencia') {
                 document.getElementById('frequencia-view').classList.remove('hidden');
-                if (window.innerWidth < 768 && !sidebar.classList.contains('-translate-x-full')) toggleSidebar();
             } else if (viewName === 'boletim') {
                 window.generateBoletimTable();
                 document.getElementById('boletim-view').classList.remove('hidden');
-                if (window.innerWidth < 768 && !sidebar.classList.contains('-translate-x-full')) toggleSidebar();
             } else if (viewName === 'registro') {
                 document.getElementById('registro-view').classList.remove('hidden');
-                if (window.innerWidth < 768 && !sidebar.classList.contains('-translate-x-full')) toggleSidebar();
+            } else if (viewName === 'caderno') {
+                window.renderNotebookPage();
+                document.getElementById('caderno-view').classList.remove('hidden');
             } else {
                 document.getElementById('default-view').classList.remove('hidden');
             }
+            
+            if (window.innerWidth < 768 && !sidebar.classList.contains('-translate-x-full')) {
+                toggleSidebar();
+            }
         }
         
+        // Abre na frequência por padrão
         window.showView('frequencia');
     </script>
 </body>
